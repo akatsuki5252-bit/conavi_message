@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "831737840062",
+    "project_id": "conavi-message",
+    "storage_bucket": "conavi-message.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831737840062:android:61158864a90a1386a539ef",
+        "android_client_info": {
+          "package_name": "net.conavi.aps.conavimessage"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831737840062-n65jpterd7es42rlck8vc3v6qs2h5rpp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB55j7yPvrKCbq70FJmPwp4nJNQnIvYDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831737840062-n65jpterd7es42rlck8vc3v6qs2h5rpp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "831737840062-7ae94n9id2vesub1gvd1a5v14q1afe7p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.conavi.yoshinzemi.conaviMessage"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:831737840062:android:b94bd15fa89349cda539ef",
+        "android_client_info": {
+          "package_name": "net.conavi.yoshinzemi.conavi_message"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "831737840062-n65jpterd7es42rlck8vc3v6qs2h5rpp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAB55j7yPvrKCbq70FJmPwp4nJNQnIvYDs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "831737840062-n65jpterd7es42rlck8vc3v6qs2h5rpp.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "831737840062-7ae94n9id2vesub1gvd1a5v14q1afe7p.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "net.conavi.yoshinzemi.conaviMessage"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

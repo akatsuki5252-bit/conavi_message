@@ -1,0 +1,335 @@
+//**import 'package:audio_session/audio_session.dart';
+import 'package:conavi_message/utils/audio_common.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+//**import 'package:just_audio/just_audio.dart';
+//**import 'package:rxdart/rxdart.dart';
+
+class AudioViewPage extends StatefulWidget {
+  final String url;
+  final String fileName;
+  const AudioViewPage(this.url,this.fileName,{Key? key}) : super(key: key);
+
+  @override
+  State<AudioViewPage> createState() => _AudioViewPageState();
+}
+
+class _AudioViewPageState extends State<AudioViewPage> with WidgetsBindingObserver {
+  final _player = null;//AudioPlayer();
+
+  @override
+  void initState() {
+    super.initState();
+    ambiguate(WidgetsBinding.instance)!.addObserver(this);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black,
+    ));
+    _init();
+  }
+
+  Future<void> _init() async {
+    // Inform the operating system of our app's audio attributes etc.
+    // We pick a reasonable default for an app that plays speech.
+    //final session = await AudioSession.instance;
+    //await session.configure(const AudioSessionConfiguration.speech());
+    // Listen to errors during playback.
+    _player.playbackEventStream.listen((event) {},
+        onError: (Object e, StackTrace stackTrace) {
+          print('A stream error occurred: $e');
+        });
+    // Try to load audio from a source and catch any errors.
+    try {
+      // AAC example: https://dl.espressif.com/dl/audio/ff-16b-2c-44100hz.aac
+      /*await _player.setAudioSource(AudioSource.uri(Uri.parse(widget.url)));
+      _player.play();*/
+    } catch (e) {
+      print("Error loading audio source: $e");
+    }
+  }
+
+  @override
+  void dispose() {
+    ambiguate(WidgetsBinding.instance)!.removeObserver(this);
+    // Release decoders and buffers back to the operating system making them
+    // available for other apps to use.
+    _player.dispose();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.paused) {
+      // Release the player's resources when not in use. We use "stop" so that
+      // if the app resumes later, it will still remember what position to
+      // resume from.
+      _player.stop();
+    }
+  }
+
+  /// Collects the data useful for displaying in a seek bar, using a handy
+  /// feature of rx_dart to combine the 3 streams of interest into one.
+  /*Stream<PositionData> get _positionDataStream =>
+      Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+          _player.positionStream,
+          _player.bufferedPositionStream,
+          _player.durationStream,
+              (position, bufferedPosition, duration) => PositionData(
+              position, bufferedPosition, duration ?? Duration.zero));*/
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          widget.fileName,
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        centerTitle: false,
+      ),
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            // Display play/pause button and volume/speed sliders.
+            ControlButtons(_player),
+            // Display seek bar. Using StreamBuilder, this widget rebuilds
+            // each time the position, buffered position or duration changes.
+            /*StreamBuilder<PositionData>(
+              stream: _positionDataStream,
+              builder: (context, snapshot) {
+                final positionData = snapshot.data;
+                return SeekBar(
+                  duration: positionData?.duration ?? Duration.zero,
+                  position: positionData?.position ?? Duration.zero,
+                  bufferedPosition:
+                      positionData?.bufferedPosition ?? Duration.zero,
+                  onChangeEnd: _player.seek,
+                );
+              },
+            ),*/
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Displays the play/pause button and volume/speed sliders.
+class ControlButtons extends StatelessWidget {
+  final player;
+
+  const ControlButtons(this.player, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Opens volume slider dialog
+        // IconButton(
+        //   icon: const Icon(Icons.volume_up),
+        //   onPressed: () {
+        //     showSliderDialog(
+        //       context: context,
+        //       title: "Adjust volume",
+        //       divisions: 10,
+        //       min: 0.0,
+        //       max: 1.0,
+        //       value: player.volume,
+        //       stream: player.volumeStream,
+        //       onChanged: player.setVolume,
+        //     );
+        //   },
+        // ),
+
+        /// This StreamBuilder rebuilds whenever the player state changes, which
+        /// includes the playing/paused state and also the
+        /// loading/buffering/ready state. Depending on the state we show the
+        /// appropriate button or loading indicator.
+        /*StreamBuilder<PlayerState>(
+          stream: player.playerStateStream,
+          builder: (context, snapshot) {
+            final playerState = snapshot.data;
+            final processingState = playerState?.processingState;
+            final playing = playerState?.playing;
+            if (processingState == ProcessingState.loading ||
+                processingState == ProcessingState.buffering) {
+              return Container(
+                margin: const EdgeInsets.all(8.0),
+                width: 64.0,
+                height: 64.0,
+                child: const CircularProgressIndicator(),
+              );
+            } else if (playing != true) {
+              return IconButton(
+                icon: const Icon(Icons.play_arrow),
+                iconSize: 64.0,
+                onPressed: player.play,
+              );
+            } else if (processingState != ProcessingState.completed) {
+              return IconButton(
+                icon: const Icon(Icons.pause),
+                iconSize: 64.0,
+                onPressed: player.pause,
+              );
+            } else {
+              return IconButton(
+                icon: const Icon(Icons.replay),
+                iconSize: 64.0,
+                onPressed: () => player.seek(Duration.zero),
+              );
+            }
+          },
+        ),*/
+        // Opens speed slider dialog
+        // StreamBuilder<double>(
+        //   stream: player.speedStream,
+        //   builder: (context, snapshot) => IconButton(
+        //     icon: Text("${snapshot.data?.toStringAsFixed(1)}x",
+        //         style: const TextStyle(fontWeight: FontWeight.bold)),
+        //     onPressed: () {
+        //       showSliderDialog(
+        //         context: context,
+        //         title: "Adjust speed",
+        //         divisions: 10,
+        //         min: 0.5,
+        //         max: 1.5,
+        //         value: player.speed,
+        //         stream: player.speedStream,
+        //         onChanged: player.setSpeed,
+        //       );
+        //     },
+        //   ),
+        // ),
+      ],
+    );
+  }
+}
+
+// else if(message.file.isAudioFlag) {
+// //audio
+// return Bubble(
+// //margin: const BubbleEdges.only(top: ),
+// color: message.isMe ? const Color(0xFFFCD997) : HexColor('d1d8e0'),
+// radius: const Radius.circular(15),
+// nip: message.isMe ? BubbleNip.rightBottom : BubbleNip.leftTop,
+// child: Container(
+// padding: const EdgeInsets.symmetric(horizontal: 2),
+// //表示可能領域の6割まで横サイズ
+// constraints: BoxConstraints(
+// maxWidth: MediaQuery.of(context).size.width * 0.6,
+// minWidth: 10,
+// ),
+// child: Row(
+// mainAxisSize: MainAxisSize.min,
+// children: [
+// IconButton(
+// color: Colors.blue,
+// padding: const EdgeInsets.all(5),
+// constraints: const BoxConstraints(
+// maxWidth: 40,
+// ),
+// icon: ref.watch(message.file.iconAudioPlayerProvider),
+// onPressed: () async {
+// print('[id:${message.id}]:play:${message.file.audioPlayer!.playing}');
+// //再生
+// if(!message.file.audioPlayer!.playing){
+// print('[id:${message.id}]:play:start');
+// //他の音声ファイルを停止
+// stopAudioPlayers(message.id);
+// //ボタンの切替
+// ref.read(message.file.isAudioPlayProvider.notifier).state = true;
+// //再生
+// await message.file.audioPlayer!.play();
+// print('[id:${message.id}]:play:end');
+// //完了時に再セット
+// if(message.file.audioPlayer!.processingState == ProcessingState.completed) {
+// try {
+// await message.file.audioPlayer!.stop();
+// await message.file.audioPlayer!.setUrl(message.file.fileUrl);
+// print('[id:${message.id}]:play:set');
+// } catch (e) {
+// print(e);
+// }
+// //ボタンの切替
+// ref.read(message.file.isAudioPlayProvider.notifier).state = false;
+// }
+// print('[id:${message.id}]:play:finish');
+// }else{
+// //ボタンの切替
+// ref.read(message.file.isAudioPlayProvider.notifier).state  = false;
+// //一時停止
+// await message.file.audioPlayer!.pause();
+// }
+// },
+// ),
+// const Flexible(
+// // child: Text(
+// //   message.fileName,
+// //   textAlign: TextAlign.start,
+// //   style: TextStyle(
+// //       fontSize: 15,
+// //       color: message.isMe ? Colors.black : Colors.black),
+// // ),
+// child: Icon(
+// Icons.audio_file_outlined,
+// ),
+// ),
+// ],
+// ),
+// ),
+// );
+
+// //ファイルの破棄
+// void disposeFile(){
+//   for (var key in _files.keys) {
+//     print('$key : ${_files[key]}');
+//     if(_files[key] != null) {
+//       if(_files[key]!.audioPlayer != null) _files[key]!.audioPlayer!.dispose();
+//       // if(_files[key]!.videoPlayerController != null) {
+//       //   print('video dispoce $key : ${_files[key]}');
+//       //   _files[key]!.videoPlayerController!.pause();
+//       //   _files[key]!.videoPlayerController!.dispose();
+//       // }
+//     }
+//   }
+// }
+
+// //再生中の音声ファイルを停止
+// void stopAudioPlayers(String messageId){
+//   for (var key in _files.keys) {
+//     print('$key : ${_files[key]}');
+//     if(_files[key] != null) {
+//       if (_files[key]!.audioPlayer != null){
+//         if(_files[key]!.id != messageId){
+//           print('stopAudioPlayers:[id:${_files[key]!.id}]');
+//           //ボタンを元に戻す
+//           ref.read(_files[key]!.isAudioPlayProvider.notifier).state  = false;
+//           //再生中の場合は停止
+//           if(_files[key]!.audioPlayer!.playing) {
+//             print('[id:${_files[key]!.id}]:stop');
+//             _files[key]!.audioPlayer!.stop();
+//           }
+//         }
+//       }
+//     }
+//   }
+//   // List<Message>? talkMessageList = ref.read(talkMessagesFutureProvider(widget.talkRoom)).value;
+//   // if(talkMessageList != null){
+//   //   for (var message in talkMessageList) {
+//   //     if(message.file.audioPlayer != null){
+//   //       if(message.id != messageId){
+//   //         print('stopAudioPlayers:[id:${message.id}]');
+//   //         //ボタンを元に戻す
+//   //         ref.read(message.file.isAudioPlayProvider.notifier).state  = false;
+//   //         //再生中の場合は停止
+//   //         if(message.file.audioPlayer!.playing) {
+//   //           print('[id:${message.id}]:stop');
+//   //           message.file.audioPlayer!.stop();
+//   //         }
+//   //       }
+//   //     }
+//   //   }
+//   // }
+// }
