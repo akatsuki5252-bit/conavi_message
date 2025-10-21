@@ -84,6 +84,8 @@ void main() async {
   // バックグラウンド通知を受けた時の処理を登録
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  //バージョン管理テスト！！
+
   runApp(
     ProviderScope( // Riverpodを全体に提供
       // //複数解像度対応
