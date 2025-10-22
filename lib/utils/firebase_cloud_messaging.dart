@@ -7,6 +7,11 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseCloudMessaging {
+  // Firebase Messaging のトークン更新リスナーが重複登録されないように制御するフラグ
+  // Flutter アプリでは、画面の再構築や再起動時に updateToken() が複数回呼ばれる可能性がある。
+  // そのたびに onTokenRefresh.listen(...) を登録すると、同じリスナーが何重にも実行されてしまうため、
+  // 一度だけ登録したら true にして再登録を防ぐ。
+  static bool _isTokenListenerAttached = false;
   /// Firebase Messagingの基本セットアップ
   static Future<void> setup() async {
     // iOSフォアグラウンド通知設定（アラート・バッジ・サウンドを有効）
@@ -93,16 +98,21 @@ class FirebaseCloudMessaging {
       debugPrint('⚠️ FCMトークンがnullまたは空のため登録スキップ');
     }
 
-    //リフレッシュ時にアカウントのトークンを更新
-    FirebaseMessaging.instance.onTokenRefresh.listen((String newFcmToken) async {
-      await ApiMembers.updateFcmToken(
-        mid: mid,
-        token: newFcmToken,
-        domain: domain,
-      );
-      Authentication.myAccount?.member.fcmToken = newFcmToken;
-      print('refreshToken:$newFcmToken');
-    });
+    // 二重登録防止付き onTokenRefresh
+    if (!_isTokenListenerAttached) {
+      _isTokenListenerAttached = true;
+      //リフレッシュ時にアカウントのトークンを更新
+      FirebaseMessaging.instance.onTokenRefresh.listen((
+          String newFcmToken) async {
+        await ApiMembers.updateFcmToken(
+          mid: mid,
+          token: newFcmToken,
+          domain: domain,
+        );
+        Authentication.myAccount?.member.fcmToken = newFcmToken;
+        print('refreshToken:$newFcmToken');
+      });
+    }
 
     return fcmToken ?? '';
   }
