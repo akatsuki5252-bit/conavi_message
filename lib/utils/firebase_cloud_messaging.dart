@@ -7,9 +7,9 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 
 class FirebaseCloudMessaging {
+  /// Firebase Messagingの基本セットアップ
   static Future<void> setup() async {
-    /// Update the iOS foreground notification presentation options to allow
-    /// heads up notifications.
+    // iOSフォアグラウンド通知設定（アラート・バッジ・サウンドを有効）
     await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true,
       badge: true,
@@ -17,6 +17,7 @@ class FirebaseCloudMessaging {
     );
   }
 
+  /// iOS 通知権限をリクエスト
   static Future<void> requestPermissions() async {
     if (Platform.isIOS) {
       await FirebaseMessaging.instance.requestPermission(
@@ -31,18 +32,67 @@ class FirebaseCloudMessaging {
     }
   }
 
+  /// FCMトークンを取得してサーバーに登録
   static Future<String> updateToken({
     required String domain,
     required String? mid}) async {
-    //トークンを取得
-    final fcmToken = await FirebaseMessaging.instance.getToken();
-    //アカウントのトークンを更新
-    await ApiMembers.updateFcmToken(
-        mid: mid,
-        token: fcmToken,
-        domain:domain
-    );
-    print('updateToken:$fcmToken');
+    final messaging = FirebaseMessaging.instance;
+
+    // 🔹 iOSの場合はAPNsトークンが得られるまで少し待つ
+    if (Platform.isIOS) {
+      final settings = await messaging.requestPermission();
+      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
+        debugPrint('🔕 通知が拒否されているため、FCMトークンを取得しません');
+        return '';
+      }
+      String? apnsToken;
+      int retry = 0;
+      while (apnsToken == null && retry < 5) {
+        apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+        if (apnsToken != null) {
+          debugPrint('✅ APNsトークン取得成功: $apnsToken');
+          break;
+        }
+        retry++;
+        debugPrint('⚠️ まだAPNsトークンがnull、再試行 ($retry/10)');
+        await Future.delayed(const Duration(seconds: 1)); // ←ここで1秒待つ
+      }
+      if (apnsToken == null) {
+        debugPrint('⚠️ APNsトークンが未取得');
+      }
+    }
+
+    // 🔹 FCMトークンの取得をtry-catchで安全化
+    String? fcmToken;
+    try {
+      fcmToken = await messaging.getToken();
+    } catch (e) {
+      if (e.toString().contains('apns-token-not-set')) {
+        debugPrint('⚠️ APNsトークン未取得のためFCMトークン生成失敗');
+        fcmToken = null;
+      } else {
+        debugPrint('❌ FCMトークン取得中に予期せぬエラー: $e');
+        return '';
+      }
+    }
+
+    // 🔹 成功時のみサーバーに登録
+    if (fcmToken != null && fcmToken.isNotEmpty) {
+      try {
+        await ApiMembers.updateFcmToken(
+          mid: mid,
+          token: fcmToken,
+          domain: domain,
+        );
+        Authentication.myAccount?.member.fcmToken = fcmToken;
+        debugPrint('✅ updateToken: $fcmToken');
+      } catch (e) {
+        debugPrint('⚠️ サーバー更新中にエラー: $e');
+      }
+    } else {
+      debugPrint('⚠️ FCMトークンがnullまたは空のため登録スキップ');
+    }
+
     //リフレッシュ時にアカウントのトークンを更新
     FirebaseMessaging.instance.onTokenRefresh.listen((String newFcmToken) async {
       await ApiMembers.updateFcmToken(
@@ -54,7 +104,7 @@ class FirebaseCloudMessaging {
       print('refreshToken:$newFcmToken');
     });
 
-    return fcmToken!;
+    return fcmToken ?? '';
   }
 
   static Future<void> deleteToken({
