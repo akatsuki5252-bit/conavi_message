@@ -2,6 +2,7 @@ import 'package:conavi_message/api/api_group_message.dart';
 import 'package:conavi_message/model/talk_group_member.dart';
 import 'package:conavi_message/model/talk_group_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/message/edit_group_member_page.dart';
@@ -90,7 +91,7 @@ class _ParticipateGroupMemberPageState extends ConsumerState<ParticipateGroupMem
                       builder: (context) => EditGroupMemberPage(widget.talkRoom),
                     ),
                   );
-                  print(result);
+                  FunctionUtils.log(result);
                   // if(result is List<TalkGroupMember>){
                   //   _talkMembers = result;
                   //   setState(() {
@@ -196,7 +197,7 @@ class _ParticipateGroupMemberPageState extends ConsumerState<ParticipateGroupMem
   //               ];
   //               memberIds.sort((a, b) => a.compareTo(b));
   //               String listAsString = FunctionUtils.listToString(memberIds);
-  //               //print(listAsString);
+  //               //FunctionUtils.log(listAsString);
   //               //ルーム情報を作成・取得
   //               final talkRoom = await ApiMessages.createRoom(
   //                 joinedMemberIds: listAsString,

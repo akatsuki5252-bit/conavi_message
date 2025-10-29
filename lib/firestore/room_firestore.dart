@@ -3,6 +3,7 @@ import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/model/talk_room.dart';
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 
 class RoomFirestore {
   static final FirebaseFirestore _firebaseFirestoreInstance = FirebaseFirestore.instance;
@@ -19,10 +20,10 @@ class RoomFirestore {
         'modified_time': Timestamp.now(),
       });
 
-      print('ルーム作成完了');
+      FunctionUtils.log('ルーム作成完了');
       return true;
     } catch (e) {
-      print('ルームの作成失敗 ===== $e');
+      FunctionUtils.log('ルームの作成失敗 ===== $e');
       return false;
     }
   }
@@ -36,9 +37,9 @@ class RoomFirestore {
   //   try {
   //     final members = await MemberApi.fetchMembers(mid!);
   //     if (members == null) return;
-  //     //print(mid);
+  //     //FunctionUtils.log(mid);
   //     for (var member in members) {
-  //       //print(member.id);
+  //       //FunctionUtils.log(member.id);
   //       if (member.id == mid) return;
   //
   //       ///roomコレクション内のルーム情報を検索
@@ -51,19 +52,19 @@ class RoomFirestore {
   //           'joined_user_ids': [member.id, mid],
   //           'created_time': Timestamp.now(),
   //         });
-  //         print('ルーム[${member.id}=${mid}]作成');
+  //         FunctionUtils.log('ルーム[${member.id}=${mid}]作成');
   //       }
   //     }
   //     /*final snapshot = await _roomCollection
   //         .where('joined_user_ids', isEqualTo: ['11', mid]).get();
-  //     print(snapshot.docs);*/
+  //     FunctionUtils.log(snapshot.docs);*/
   //
   //     // for (var doc in snapshot.docs) {
   //     //   Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-  //     //   print(data);
+  //     //   FunctionUtils.log(data);
   //     //   /*var list = <String>['11', '1'];
   //     //   if (deepEq(data['joined_user_ids'], list)) {
-  //     //     print('yes');
+  //     //     FunctionUtils.log('yes');
   //     //   }*/
   //     //   /*if (doc.id == myUid) return;
   //     //   await _roomCollection.add({
@@ -72,9 +73,9 @@ class RoomFirestore {
   //     //   });*/
   //     // }
   //
-  //     print('ルーム作成完了');
+  //     FunctionUtils.log('ルーム作成完了');
   //   } catch (e) {
-  //     print('ルームの作成失敗 ===== $e');
+  //     FunctionUtils.log('ルームの作成失敗 ===== $e');
   //   }
   // }
 
@@ -86,7 +87,7 @@ class RoomFirestore {
       for (var doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
         List<dynamic> userIds = data['joined_user_ids'];
-        //print(userIds);
+        //FunctionUtils.log(userIds);
         List<Member> talkMembers = [];
         for (var id in userIds) {
           //if (id == myUid) continue;
@@ -104,14 +105,14 @@ class RoomFirestore {
             createdTime: data['modified_time'].toDate(),
             modifiedTime: data['modified_time'].toDate());
         talkRooms.add(talkRoom);
-        print(talkRooms);
+        FunctionUtils.log(talkRooms);
       }
       //並び順
       talkRooms.sort((a, b) => b.modifiedTime.compareTo(a.modifiedTime));
-      //print(talkRooms.length);
+      //FunctionUtils.log(talkRooms.length);
       return talkRooms;
     } catch (e) {
-      print('参加しているルームの取得失敗 ===== $e');
+      FunctionUtils.log('参加しているルームの取得失敗 ===== $e');
       return null;
     }
   }
@@ -142,7 +143,7 @@ class RoomFirestore {
         'modified_time': Timestamp.now(),
       });
     } catch (e) {
-      print('メッセージの送信失敗 ===== $e');
+      FunctionUtils.log('メッセージの送信失敗 ===== $e');
     }
   }
 }

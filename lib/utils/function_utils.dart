@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:conavi_message/model/group_message.dart';
 import 'package:conavi_message/model/member.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -24,7 +25,7 @@ class FunctionUtils {
     final ref = FirebaseStorage.instance.ref(path);
     final storedImage = await ref.putFile(image);
     String downloadUrl = await storedImage.ref.getDownloadURL();
-    print('image_path:$downloadUrl');
+    FunctionUtils.log('image_path:$downloadUrl');
     return downloadUrl;
   }
 
@@ -83,10 +84,10 @@ class FunctionUtils {
       int difDay = currentDate.difference(lastTalkDate).inDays;
       int difHour = currentDate.difference(lastTalkDate).inHours;
       int difMinute = currentDate.difference(lastTalkDate).inMinutes;
-      // print(difDay);
-      // print(difHour);
-      // print(difMinute);
-      //print(differenceDayTime);
+      // FunctionUtils.log(difDay);
+      // FunctionUtils.log(difHour);
+      // FunctionUtils.log(difMinute);
+      //FunctionUtils.log(differenceDayTime);
       if(difDay < 1){
         if(difMinute < 60){
           differenceDayTime = '$difMinute分前';
@@ -118,8 +119,8 @@ class FunctionUtils {
     double g = (((size / 1024.0) / 1024.0) / 1024.0);
     double t = ((((size / 1024.0) / 1024.0) / 1024.0) / 1024.0);
 
-    // print('size:$size');
-    // print('m:$m');
+    // FunctionUtils.log('size:$size');
+    // FunctionUtils.log('m:$m');
 
     if (t > 1) {
       hrSize = "${t.toStringAsFixed(2)} TB";
@@ -136,11 +137,11 @@ class FunctionUtils {
   }
 
   static bool checkFileSize(double fileSize,double limitSize) {
-    // print('fileSize:$fileSize');
-    // print('limitSize:$limitSize');
+    // FunctionUtils.log('fileSize:$fileSize');
+    // FunctionUtils.log(('limitSize:$limitSize');
     //MB
     double m = ((fileSize / 1024.0) / 1024.0);
-    //print('m:$m');
+    //FunctionUtils.log(('m:$m');
     if (m > 1) {
       if(m > limitSize){
         return true;
@@ -236,4 +237,25 @@ class FunctionUtils {
     );
   }
 
+  static void log(Object? message) {
+    // Debugモード以外ではログ無効
+    if (!kDebugMode) return;
+    // nullガード
+    final text = message?.toString() ?? '';
+
+    // 長すぎるログは分割（debugPrintの仕様に合わせる）
+    const int maxLogLength = 800;
+    if (text.length > maxLogLength) {
+      int start = 0;
+      while (start < text.length) {
+        final end = (start + maxLogLength < text.length)
+            ? start + maxLogLength
+            : text.length;
+        debugPrint(text.substring(start, end));
+        start = end;
+      }
+    } else {
+      debugPrint(text);
+    }
+  }
 }

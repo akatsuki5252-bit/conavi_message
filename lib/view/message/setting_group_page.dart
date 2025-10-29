@@ -5,6 +5,7 @@ import 'package:conavi_message/model/talk_group_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/utils/custom_alert_dialog.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/view/message/edit_group_name_page.dart';
 import 'package:conavi_message/view/message/invite_group_message_member_page.dart';
@@ -42,7 +43,7 @@ class _SettingGroupPageState extends ConsumerState<SettingGroupPage> {
     final myAccount = ref.read(authProvider);
     final newTalkGroupRoom = await ApiGroupMessages.fetchGroupRoom(myAccount: myAccount, roomId: widget.talkRoom.roomId);
     if(newTalkGroupRoom is TalkGroupRoom){
-      print(newTalkGroupRoom.imagePath);
+      FunctionUtils.log(newTalkGroupRoom.imagePath);
       final http.Response? response = newTalkGroupRoom.imagePath.isNotEmpty ? await http.get(Uri.parse(newTalkGroupRoom.imagePath)) : null;
       if(mounted) {
         setState(() {
@@ -99,7 +100,7 @@ class _SettingGroupPageState extends ConsumerState<SettingGroupPage> {
                               }
                             }
                             if(groupImageFile != null){
-                              print(groupImageFile);
+                              FunctionUtils.log(groupImageFile);
                               //ローディングメッセージを表示
                               Loading.show(message: '処理中...', isDismissOnTap: false);
                               bool result = await ApiGroupMessages.updateGroupRoom(
@@ -108,7 +109,7 @@ class _SettingGroupPageState extends ConsumerState<SettingGroupPage> {
                                 roomName: '',
                                 uploadFile: groupImageFile,
                               );
-                              print(result);
+                              FunctionUtils.log(result);
                               if(result){
                                 initializeGroup();
                                 _isChanged = true;
@@ -256,7 +257,7 @@ class _SettingGroupPageState extends ConsumerState<SettingGroupPage> {
                                           deleteMemberId: myAccount.member.id);
                                       //ローディングメッセージを破棄
                                       Loading.dismiss();
-                                      print(result);
+                                      FunctionUtils.log(result);
                                       if(result is bool && result){
                                         //ルームidを初期化
                                         ref.read(selectedGroupMessageRoomProvider.notifier).state = null;

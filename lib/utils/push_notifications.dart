@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:http/http.dart' as http;
 
 class PushNotifications {
@@ -32,18 +33,18 @@ class PushNotifications {
       );
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (!data.containsKey('error')) {
-          print('PushNotifications:FCM request for device sent!');
+          FunctionUtils.log('PushNotifications:FCM request for device sent!');
           return true;
         } else {
-          print('sendPushMessage error ===== ${data['error']}');
+          FunctionUtils.log('sendPushMessage error ===== ${data['error']}');
         }
       } else {
-        print('sendPushMessage statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('sendPushMessage statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('sendPushMessage try catch error ===== $e');
+      FunctionUtils.log('sendPushMessage try catch error ===== $e');
     }
     return false;
   }
@@ -76,19 +77,19 @@ class PushNotifications {
       );
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('result') && data['result'] == true) {
-          print('sendPushGroupMessage:FCM request for device sent!');
+          FunctionUtils.log('sendPushGroupMessage:FCM request for device sent!');
           return true;
         } else {
-          print('sendPushGroupMessage error ===== ${data['error']}');
+          FunctionUtils.log('sendPushGroupMessage error ===== ${data['error']}');
           return false;
         }
       } else {
-        print('sendPushGroupMessage statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('sendPushGroupMessage statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('sendPushGroupMessage try catch error ===== $e');
+      FunctionUtils.log('sendPushGroupMessage try catch error ===== $e');
     }
     return false;
   }

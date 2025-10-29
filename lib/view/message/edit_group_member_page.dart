@@ -4,6 +4,7 @@ import 'package:conavi_message/model/talk_group_member.dart';
 import 'package:conavi_message/model/talk_group_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/utils/custom_alert_dialog.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:flutter/material.dart';
@@ -101,7 +102,7 @@ class _EditGroupMemberPageState extends ConsumerState<EditGroupMemberPage> {
                                       deleteMemberId: talkMember.id);
                                   //ローディングメッセージを破棄
                                   Loading.dismiss();
-                                  print(result);
+                                  FunctionUtils.log(result);
                                   if(result is bool && result){
                                     Loading.show(message: '取得中...', isDismissOnTap: false);
                                     final talkMembers = await ApiGroupMessages.fetchGroupMembers(myAccount: myAccount, roomId: widget.talkRoom.roomId);
@@ -198,7 +199,7 @@ class _EditGroupMemberPageState extends ConsumerState<EditGroupMemberPage> {
   //               ];
   //               memberIds.sort((a, b) => a.compareTo(b));
   //               String listAsString = FunctionUtils.listToString(memberIds);
-  //               //print(listAsString);
+  //               //FunctionUtils.log(listAsString);
   //               //ルーム情報を作成・取得
   //               final talkRoom = await ApiMessages.createRoom(
   //                 joinedMemberIds: listAsString,

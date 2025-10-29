@@ -2,6 +2,7 @@ import 'package:conavi_message/api/api_domains.dart';
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/setting/result.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/mypage/edit_profile_password_page.dart';
@@ -131,8 +132,8 @@ class _PasswordResetPageState extends State<PasswordResetPage> {
                                       multiLine: false, //複数行に対応するか
                                     );
                                     if (regExp.hasMatch(_emailController.text)) {
-                                      print(_conaviIdController.text);
-                                      print(_emailController.text);
+                                      FunctionUtils.log(_conaviIdController.text);
+                                      FunctionUtils.log(_emailController.text);
                                       //ローディングを表示
                                       Loading.show(message: '確認中...', isDismissOnTap: false);
                                       //ドメインを取得

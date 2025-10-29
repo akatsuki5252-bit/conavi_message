@@ -79,7 +79,7 @@ class _EditAccountPageState extends ConsumerState<EditProfilePage2> {
                         uploadFile: _imageFile,
                         domain: myAccount.domain.url);
                     if (!result) {
-                      print(ApiMembers.error);
+                      FunctionUtils.log(ApiMembers.error);
                     }
                   }
                   var account = await updateAccount(myAccount);
@@ -135,7 +135,7 @@ class _EditAccountPageState extends ConsumerState<EditProfilePage2> {
                               limitFileSize: 5.0),
                         ),
                       );
-                      print("result: $resultFiles");
+                      FunctionUtils.log("result: $resultFiles");
                       if (resultFiles is List<ImageFile>) {
                         for (var image in resultFiles) {
                           setState((){
@@ -317,7 +317,7 @@ class _EditAccountPageState extends ConsumerState<EditProfilePage2> {
                   //                     uploadFile: _imageFile,
                   //                     domain: myAccount.domain);
                   //                 if(!result) {
-                  //                   print(ApiMembers.error);
+                  //                   FunctionUtils.log(ApiMembers.error);
                   //                 }
                   //               }
                   //               var account = await updateAccount(myAccount);

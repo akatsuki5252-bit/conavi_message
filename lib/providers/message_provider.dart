@@ -8,6 +8,7 @@ import 'package:conavi_message/model/talk_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/api/api_messages.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ final membersFutureProvider = FutureProvider<List<Member>?>((ref) async {
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('membersFutureProvider:$date');
+  FunctionUtils.log('membersFutureProvider:$date');
   return membersList;
 });
 
@@ -59,7 +60,7 @@ final talkRoomsFutureProvider = FutureProvider<List<TalkRoom>?>((ref) async {
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('talkRoomsFutureProvider:$date');
+  FunctionUtils.log('talkRoomsFutureProvider:$date');
   return talkRoomsList;
 });
 
@@ -72,7 +73,7 @@ final talkMessagesFutureProvider = FutureProvider.autoDispose.family<List<ms.Mes
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('talkMessagesFutureProvider:$date');
+  FunctionUtils.log('talkMessagesFutureProvider:$date');
   return talkMessageList;
 });
 
@@ -106,7 +107,7 @@ final talkGroupRoomsFutureProvider = FutureProvider<List<TalkGroupRoom>?>((ref) 
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('talkGroupRoomsFutureProvider:$date');
+  FunctionUtils.log('talkGroupRoomsFutureProvider:$date');
   return talkRoomsList;
 });
 
@@ -119,6 +120,6 @@ final talkGroupMessagesFutureProvider = FutureProvider.autoDispose.family<List<G
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('talkGroupMessagesFutureProvider:$date');
+  FunctionUtils.log('talkGroupMessagesFutureProvider:$date');
   return talkMessageList;
 });

@@ -43,7 +43,7 @@ class _MyPageState extends ConsumerState<MyPage> {
     final myAccount = ref.read(authProvider);
     if(myAccount.member.imagePath.isNotEmpty) {
       String url = '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}';
-      print(url);
+      FunctionUtils.log(url);
       final http.Response response = await http.get(Uri.parse(url));
       if(mounted) {
         setState(() {
@@ -166,7 +166,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                   builder: (context) => const EditProfilePage()
                                 ),
                               );
-                              print(result);
+                              FunctionUtils.log(result);
                               if(result is bool && result){
                                 setImage();
                               }
@@ -200,7 +200,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                                         const EditNotificationPage(),
                                   ),
                                 ).then((value) {
-                                  print('ok');
+                                  FunctionUtils.log('ok');
                                 });
                               });
                             },

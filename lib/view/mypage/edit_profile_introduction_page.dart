@@ -119,7 +119,7 @@ class _EditProfileIntroductionPageState extends ConsumerState<EditProfileIntrodu
                             name: '',
                             selfIntroduction: _selfIntroductionController.text,
                           );
-                          print(result);
+                          FunctionUtils.log(result);
                           if(result){
                             _isSave = true;
                             //ローディングを終了

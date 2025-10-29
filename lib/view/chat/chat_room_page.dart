@@ -87,8 +87,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                                   Message nextMessage = getMessage(
                                       snapshot.data!.docs[(index + 1)],
                                       widget.talkRoom.talkMembers);
-                                  //print(message.message);
-                                  //print(nextMessage.message);
+                                  //FunctionUtils.log(message.message);
+                                  //FunctionUtils.log(nextMessage.message);
                                   //次のメッセージ日付と同じ場合は空
                                   String nextDay =
                                       intl.DateFormat('yyyy-MM-dd(E)')

@@ -1,6 +1,7 @@
 import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/message_provider.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/view/message/message_room_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -24,7 +25,7 @@ class _TabMessagePageState extends ConsumerState<TabMessagePage> {
       //   child: const Icon(Icons.refresh),
       //   onPressed: () async {
       //     if (await FlutterAppBadger.isAppBadgeSupported()) {
-      //       print('batch');
+      //       FunctionUtils.log('batch');
       //       FlutterAppBadger.updateBadgeCount(5); // <-引数の`number`が`null`だった場合は`0`
       //     }
       //   },
@@ -59,7 +60,7 @@ class _TabMessagePageState extends ConsumerState<TabMessagePage> {
                             builder: (context) => MessageRoomPage(talkRoom),
                           ),
                         );
-                        print('result:$result');
+                        FunctionUtils.log('result:$result');
                         if (result is bool && result) {
                           // 状態を更新する
                           ref.refresh(talkRoomsFutureProvider);
@@ -160,7 +161,7 @@ class _TabMessagePageState extends ConsumerState<TabMessagePage> {
       //                     ),
       //                   );
       //                   if (result == true) {
-      //                     print('bbb');
+      //                     FunctionUtils.log('bbb');
       //                     setState(() {});
       //                   }
       //                 },

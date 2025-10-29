@@ -13,6 +13,7 @@ import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/api/api_messages.dart';
 import 'package:conavi_message/utils/firebase_cloud_messaging.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/local_notifications.dart';
 import 'package:conavi_message/utils/received_notification.dart';
 import 'package:conavi_message/view/invite_code/invite_code_page.dart';
@@ -22,6 +23,7 @@ import 'package:conavi_message/view/message/message_room_page.dart';
 import 'package:conavi_message/view/message/message_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_app_badge_control/flutter_app_badge_control.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 class Screen extends ConsumerStatefulWidget {
@@ -46,23 +48,23 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
   ];
   ///アクション通知
   void _configureDidReceiveLocalNotificationSubject() {
-    print('_configureDidReceiveLocalNotificationSubject');
+    FunctionUtils.log('_configureDidReceiveLocalNotificationSubject');
     _didReceiveSub = didReceiveLocalNotificationStream.stream.listen((ReceivedNotification receivedNotification) async {
-      print('_configureDidReceiveLocalNotificationSubject');
+      FunctionUtils.log('_configureDidReceiveLocalNotificationSubject');
     });
   }
   ///通常通知
   void _configureSelectNotificationSubject() {
-    print('_configureSelectNotificationSubject');
+    FunctionUtils.log('_configureSelectNotificationSubject');
     _selectSub = selectNotificationStream.stream.listen((String? payload) async {
-      print('selectNotificationStream.stream.listen');
+      FunctionUtils.log('selectNotificationStream.stream.listen');
       //通知をクリックしてメッセージルームのトーク画面に遷移
       await _pushNotification(payload);
     });
   }
   ///通知クリック時の挙動
   Future<void> _pushNotification(String? payload) async{
-    print('payload:${payload}');
+    FunctionUtils.log('payload:${payload}');
     //通知をクリックしてメッセージルームのトーク画面に遷移
     if (payload != null) {
       Auth myAccount = ref.read(authProvider); //アカウント情報
@@ -95,7 +97,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
             roomId: roomId,
             mid: myAccount.member.id,
           );
-          print(talkRoom);
+          FunctionUtils.log(talkRoom);
           //型チェック
           if (talkRoom is TalkRoom) {
             if (!mounted) return;
@@ -105,7 +107,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
                 builder: (context) => MessageRoomPage(talkRoom),
               ),
             );
-            print("result: $result");
+            FunctionUtils.log("result: $result");
             //戻り値がbool & true
             if (result is bool && result) {
               //画面を更新する
@@ -118,7 +120,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
             myAccount: myAccount,
             roomId: roomId,
           );
-          print(talkRoom);
+          FunctionUtils.log(talkRoom);
           if(talkRoom is TalkGroupRoom){
             if (!mounted) return;
             //画面遷移 & 戻り値
@@ -127,7 +129,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
                   builder: (context) => GroupMessageRoomPage(talkRoom)
               ),
             );
-            print("result: $result");
+            FunctionUtils.log("result: $result");
             //戻り値がbool & true
             if (result is bool && result) {
               //画面を更新する
@@ -147,19 +149,30 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
           await launchUrlString(url);
         }
       } else {
-        debugPrint('Cannot launch: $url');
+        FunctionUtils.log('Cannot launch: $url');
       }
     } catch (e) {
-      debugPrint('launch error: $e');
+      FunctionUtils.log('launch error: $e');
     }
   }
 
   @override
   void initState() {
     super.initState();
+
+    // WidgetsBinding.instance.addPostFrameCallback((_) async {
+    //   final settings = await FirebaseMessaging.instance.getNotificationSettings();
+    //   // まだ聞いてなかったら（= 初回）
+    //   if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+    //     await LocalNotifications.requestPermissions();
+    //     await FirebaseCloudMessaging.requestPermissions();
+    //   }
+    // });
+
+
     final myAccount = ref.read(authProvider);
     WidgetsBinding.instance.addObserver(this);
-    print('isAppUpdate:${myAccount.userSetting.isAppUpdate}');
+    FunctionUtils.log('isAppUpdate:${myAccount.userSetting.isAppUpdate}');
     //バージョンチェック（build完了後）
     WidgetsBinding.instance.addPostFrameCallback((_){
       //強制アップデートならアップデートダイアログを表示
@@ -215,10 +228,10 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
     //FCM：フォアグラウンド
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       //下部メッセージメニューを選択中 + メッセージ画面を表示 + 受信した通知がメッセージ画面の相手の場合、ローカル通知を通知しない
-      print('FirebaseMessaging.onMessage.listen');
+      FunctionUtils.log('FirebaseMessaging.onMessage.listen');
       if (message.notification != null) {
-        print('currentMessageRoom:${myAccount.userSetting.currentMessageRoom}');
-        print('currentGroupMessageRoom:${myAccount.userSetting.currentGroupMessageRoom}');
+        FunctionUtils.log('currentMessageRoom:${myAccount.userSetting.currentMessageRoom}');
+        FunctionUtils.log('currentGroupMessageRoom:${myAccount.userSetting.currentGroupMessageRoom}');
         ///メッセージ画面表示中に相手からメッセージが来た場合
         if (myAccount.userSetting.currentBottomNavigationIndex == BottomNavigationMenu.message.index &&
             myAccount.userSetting.currentMessageRoom != null &&
@@ -226,7 +239,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
             message.data['room_id'] == myAccount.userSetting.currentMessageRoom!.roomId) {
           //通知ペイロードのルームidと現在表示しているルームidを比較
           ref.refresh(talkMessagesFutureProvider(myAccount.userSetting.currentMessageRoom!));
-          print('メッセージ通知自動更新');
+          FunctionUtils.log('メッセージ通知自動更新');
         }
         ///グループメッセージ画面表示中に相手からメッセージが来た場合
         else if (myAccount.userSetting.currentBottomNavigationIndex == BottomNavigationMenu.message.index &&
@@ -235,14 +248,14 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
             message.data['room_id'] == myAccount.userSetting.currentGroupMessageRoom!.roomId) {
           //通知ペイロードのルームidと現在表示しているルームidを比較
           ref.refresh(talkGroupMessagesFutureProvider(myAccount.userSetting.currentGroupMessageRoom!));
-          print('グループメッセージ通知自動更新');
+          FunctionUtils.log('グループメッセージ通知自動更新');
         } else {
           //メッセージの通知がONの場合ローカル通知作成
           //if(myAccount.userSetting.localNotificationFlag) {
           RemoteNotification? notification = message.notification;
           AndroidNotification? android = message.notification?.android;
           if (notification != null && android != null) {
-            print('ローカルメッセージ通知');
+            FunctionUtils.log('ローカルメッセージ通知');
             FirebaseCloudMessaging.receiveNotification(message, 'onMessage');
           }
           //}
@@ -254,7 +267,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
 
             // 400msの遅延を設定（通知が続いてきてもこの間はリロードは発生しない）
             _refreshDebounce = Timer(const Duration(milliseconds: 400), () {
-              print('タブ一覧情報更新');
+              FunctionUtils.log('タブ一覧情報更新');
               // invalidate() は「今すぐ取得」ではなく「次に参照された時に再取得」を指示する
               ref.invalidate(membersFutureProvider); // → メンバー一覧の次回使用時に自動リロードする
               ref.invalidate(talkRoomsFutureProvider); // → 1対1トークルーム一覧も「次回参照で再取得」に切り替える
@@ -296,16 +309,16 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    print("stete = $state");
+    FunctionUtils.log("stete = $state");
     switch (state) {
       case AppLifecycleState.inactive:
-        print('非アクティブになったときの処理');
+        FunctionUtils.log('非アクティブになったときの処理');
         break;
       case AppLifecycleState.paused:
-        print('停止されたときの処理');
+        FunctionUtils.log('停止されたときの処理');
         break;
       case AppLifecycleState.resumed:
-        print('再開されたときの処理');
+        FunctionUtils.log('再開されたときの処理');
         final myAccount = ref.read(authProvider);
         //メッセージメニュー画面選択
         if(myAccount.userSetting.currentBottomNavigationIndex == BottomNavigationMenu.message.index) {
@@ -324,7 +337,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
         }
         break;
       case AppLifecycleState.detached:
-        print('破棄されたときの処理');
+        FunctionUtils.log('破棄されたときの処理');
         break;
       case AppLifecycleState.hidden:
         // TODO: Handle this case.
@@ -398,6 +411,16 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
             }
           },
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async{
+          bool isSupported =
+              await FlutterAppBadgeControl.isAppBadgeSupported();
+          // ignore: avoid_print
+          FunctionUtils.log('isSupported: $isSupported');
+          await FlutterAppBadgeControl.updateBadgeCount(1);
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }

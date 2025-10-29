@@ -5,6 +5,7 @@ import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/view/message/member_page.dart';
 import 'package:conavi_message/view/screen.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,7 @@ class _TabMemberPageState extends ConsumerState<TabMemberPage> {
                           var result = await Navigator.push(context,
                             MaterialPageRoute(builder: (context) => MemberPage(member)),
                           );
-                          print('result:$result');
+                          FunctionUtils.log('result:$result');
                           if (result is bool && result) {
                             ref.refresh(membersFutureProvider);
                           }

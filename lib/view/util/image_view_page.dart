@@ -1,4 +1,5 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -110,7 +111,7 @@ class _ImageViewPageState extends ConsumerState<ImageViewPage> {
 
                               var result = await GallerySaver.saveImage(filePath,albumName: 'CONAVI');
 
-                              print(result);
+                              FunctionUtils.log(result);
                               if(result != null && result){
                                 Loading.dismiss();
                               }else{
@@ -126,7 +127,7 @@ class _ImageViewPageState extends ConsumerState<ImageViewPage> {
                           //     Loading.show(message: 'ダウンロード中...', isDismissOnTap: false);
                           //     final http.Response response = await http.get(Uri.parse(widget.url));
                           //     final result = await ImageGallerySaver.saveImage(response.bodyBytes);
-                          //     print(result);
+                          //     FunctionUtils.log(result);
                           //     if(result['isSuccess'] != null && result['isSuccess']){
                           //       Loading.dismiss();
                           //     }else{

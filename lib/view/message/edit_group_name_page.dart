@@ -119,7 +119,7 @@ class _EditGroupNamePageState extends ConsumerState<EditGroupNamePage> {
                             roomName: _groupNameController.text,
                             uploadFile: null,
                           );
-                          print(result);
+                          FunctionUtils.log(result);
                           if(result){
                             _isSave = true;
                           }

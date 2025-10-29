@@ -51,7 +51,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
     final myAccount = ref.read(authProvider);
     final selectedGroupImageFile = ref.watch(createGroupImagePathProvider);
     final selectedMembers = ref.watch(createGroupMembersProvider);
-    //print(selectedMembers);
+    //FunctionUtils.log(selectedMembers);
     return GestureDetector(
       onTap: () => primaryFocus?.unfocus(),
       child: Scaffold(
@@ -100,7 +100,7 @@ class _CreateGroupPageState extends ConsumerState<CreateGroupPage> {
                       imageUrl: talkGroupRoom.imagePath
                     );
                     if(!result){
-                      print('プッシュ通知でエラーが発生');
+                      FunctionUtils.log('プッシュ通知でエラーが発生');
                     }
                     //ローディングを終了
                     Loading.dismiss();

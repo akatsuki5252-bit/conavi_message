@@ -3,6 +3,7 @@ import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/setting/domain.dart';
 import 'package:conavi_message/setting/user_setting.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import 'package:intl/intl.dart';
 
@@ -18,13 +19,13 @@ final authProvider = StateProvider<Auth>((ref) {
   userSetting.currentFilePreviewFlag = ref.watch(isFilePreviewFlagProvider);
   userSetting.localNotificationFlag = ref.watch(isLocalNotificationProvider);
   userSetting.currentMessageSort = ref.watch(selectedMessageSortProvider);
-  // print('userSetting.currentMessageRoom:${userSetting.currentMessageRoom}');
-  // print('userSetting.currentFilePreviewFlag:${userSetting.currentFilePreviewFlag}');
+  // FunctionUtils.log'userSetting.currentMessageRoom:${userSetting.currentMessageRoom}');
+  // FunctionUtils.log'userSetting.currentFilePreviewFlag:${userSetting.currentFilePreviewFlag}');
 
   DateTime now = DateTime.now();
   DateFormat outputFormat = DateFormat('yyyy-MM-dd HH:mm:ss');
   String date = outputFormat.format(now);
-  print('authProvider:$date');
+  FunctionUtils.log('authProvider:$date');
 
   return Auth(
     domain: domain,

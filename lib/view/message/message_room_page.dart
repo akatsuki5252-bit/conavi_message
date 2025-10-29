@@ -88,26 +88,26 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.inactive:
-        print('room-message:非アクティブになったときの処理');
+        FunctionUtils.log('room-message:非アクティブになったときの処理');
         break;
       case AppLifecycleState.paused:
-        print('room-message:停止されたときの処理');
+        FunctionUtils.log('room-message:停止されたときの処理');
         break;
       case AppLifecycleState.resumed:
-        print('room-message:再開されたときの処理');
+        FunctionUtils.log('room-message:再開されたときの処理');
         break;
       case AppLifecycleState.detached:
-        print('room-message:破棄されたときの処理');
+        FunctionUtils.log('room-message:破棄されたときの処理');
         break;
       case AppLifecycleState.hidden:
-        print('room-message:hidden');
+        FunctionUtils.log('room-message:hidden');
         break;
     }
   }
 
   //メッセージタップ時のダイアログ
   Widget showMessageOptionDialog(Message message,bool isMe){
-    print(message.message);
+    FunctionUtils.log(message.message);
     return SimpleDialog(
       children: [
         if(message.message.isNotEmpty)
@@ -466,7 +466,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                           final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
                                           if (pickedFile == null) throw Exception('file:null');
                                           List<File> files = [File(pickedFile.path)];
-                                          print(files);
+                                          FunctionUtils.log(files);
                                           sendUploads(
                                               talkRoom: widget.talkRoom,
                                               myAccount: myAccount,
@@ -477,7 +477,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                               pushMemberIds: _pushMemberIds,
                                           );
                                         } catch (e) {
-                                          print('Failed to pick file: $e');
+                                          FunctionUtils.log('Failed to pick file: $e');
                                         }
                                       },
                                       icon: const Icon(Icons.camera_alt_outlined, color: Colors.grey),
@@ -507,7 +507,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                                 limitFileSize: 100.0),
                                           ),
                                         );
-                                        print("result: $result");
+                                        FunctionUtils.log("result: $result");
                                         if (result is List<PickerFile>) {
                                           List<File> files = [];
                                           for(var pickerFile in result){
@@ -631,11 +631,11 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                     ),
                     // MessageBar(
                     //   replyCloseColor: Colors.black,
-                    //   onTapCloseReply: (){print('aa');},
+                    //   onTapCloseReply: (){FunctionUtils.log('aa');},
                     //   replying: true,
                     //   replyingTo: 'aaa',
                     //   sendButtonColor: Colors.amber,
-                    //   onSend: (_) => print(_),
+                    //   onSend: (_) => FunctionUtils.log(_),
                     //   actions: [
                     //     InkWell(
                     //       child: Icon(
@@ -685,7 +685,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
         });
     switch(selectedOption){
       case MessageOption.copy:
-        print('copy');
+        FunctionUtils.log('copy');
         Clipboard.setData(ClipboardData(text: message.message));
         break;
       case MessageOption.delete:
@@ -701,7 +701,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
               cancelActionText: 'Cancel',
               defaultActionText: 'OK',
               action: () async {
-                print('delete:${message.id}');
+                FunctionUtils.log('delete:${message.id}');
                 //ローディングメッセージを表示
                 Loading.show(message: '削除中...', isDismissOnTap: false,);
                 var result = await ApiMessages.deleteMessage(
@@ -727,7 +727,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
   //ファイルメッセージ
   Widget showFile(Auth myAccount,TalkRoom talkRoom,Message message){
     if(message.file.isImageFlag){
-      print(message.file.fileUrl);
+      FunctionUtils.log(message.file.fileUrl);
       //画像
       return Container(
           constraints: BoxConstraints(
@@ -816,7 +816,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                 //MaterialPageRoute(builder: (context) => TestAudioPage())
             );
           }
-          print("result: $result");
+          FunctionUtils.log("result: $result");
           if(result is bool && result){
             //ファイル閲覧フラグ
             ref.read(isFilePreviewFlagProvider.notifier).state = false;
@@ -864,10 +864,10 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                   //           if (await canLaunchUrl(uri)) {
                   //             await launchUrl(uri);
                   //           } else {
-                  //             print('Could not launch $uri');
+                  //             FunctionUtils.log('Could not launch $uri');
                   //           }
                   //         } catch (e) {
-                  //           print('error url_launch:$e');
+                  //           FunctionUtils.log('error url_launch:$e');
                   //         }
                   //       },
                   //   )
@@ -963,10 +963,10 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                 //           if (await canLaunchUrl(uri)) {
                 //             await launchUrl(uri);
                 //           } else {
-                //             print('Could not launch $uri');
+                //             FunctionUtils.log('Could not launch $uri');
                 //           }
                 //         } catch (e) {
-                //           print('error url_launch:$e');
+                //           FunctionUtils.log('error url_launch:$e');
                 //         }
                 //       },
                 //   )
@@ -998,7 +998,7 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
       imageUrl: imageUrl
     );
     if(!result){
-      print('プッシュ通知でエラーが発生');
+      FunctionUtils.log('プッシュ通知でエラーが発生');
     }
   }
 

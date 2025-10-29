@@ -36,7 +36,7 @@ class ApiMessages {
       if (response.statusCode == 200) {
         //jsonをデコード
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         //キーの存在チェック
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           //カンマ区切り文字列をList<String>に変換
@@ -74,20 +74,20 @@ class ApiMessages {
             createdTime: data['rooms']['created'] != null ? DateTime.parse(data['rooms']['created']) : DateTime.now(),
             modifiedTime: talkDateTime, //ルームの最新更新日付
           );
-          print('メンバールーム作成・取得完了');
+          FunctionUtils.log('メンバールーム作成・取得完了');
           return talkRoom;
         } else {
           //キーの存在チェックでエラー
           error = data['error'];
-          print('createRoom error ===== ${data['error']}');
+          FunctionUtils.log('createRoom error ===== ${data['error']}');
         }
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createRoom statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createRoom statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createRoom try catch error ===== $e');
+      FunctionUtils.log('createRoom try catch error ===== $e');
     }
     return null;
   }
@@ -103,12 +103,12 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           List<TalkRoom> talkRooms = [];
           bool isContinue = false;
           for (var room in data['rooms']) {
-            //print(json.encode(room));
+            //FunctionUtils.log(json.encode(room));
             if(room['modified'] == null || room['last_message'] == null) continue;
             List<String> memberIds = FunctionUtils.stringToList(room['joined_member_ids']);
             List<Member> talkMembers = [];
@@ -174,11 +174,11 @@ class ApiMessages {
 
               talkRooms.add(talkRoom);
             }catch(e){
-              print('fetchJoinedRooms room try catch error ===== $e');
+              FunctionUtils.log('fetchJoinedRooms room try catch error ===== $e');
             }
           }
           //並び順
-          //print(myAccount.userSetting.currentMessageSort);
+          //FunctionUtils.log(myAccount.userSetting.currentMessageSort);
           if(myAccount.userSetting.currentMessageSort == MessageSort.time) {
             talkRooms.sort((a, b) => b.modifiedTime.compareTo(a.modifiedTime));
           }else if(myAccount.userSetting.currentMessageSort == MessageSort.unRead) {
@@ -187,13 +187,13 @@ class ApiMessages {
           return talkRooms;
         } else {
           error = data['error'];
-          print('fetchJoinedRooms error ===== ${data['error']}');
+          FunctionUtils.log('fetchJoinedRooms error ===== ${data['error']}');
         }
       } else {
-        print('fetchJoinedRooms statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchJoinedRooms statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchJoinedRooms try catch error ===== $e');
+      FunctionUtils.log('fetchJoinedRooms try catch error ===== $e');
     }
     return null;
   }
@@ -212,7 +212,7 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           var room = data['rooms'];
           List<String> memberIds = FunctionUtils.stringToList(room['joined_member_ids']);
@@ -244,19 +244,19 @@ class ApiMessages {
                 lastSendTime: FunctionUtils.createLastSendTime(room['modified']),
                 countUnRead: int.parse(room['unread_count'])
             );
-            //print(talkRoom);
+            //FunctionUtils.log(talkRoom);
             return talkRoom;
           }catch(e){
-            print('fetchRoom room try catch error ===== $e');
+            FunctionUtils.log('fetchRoom room try catch error ===== $e');
           }
         } else {
-          print('fetchRoom error ===== ${data['error']}');
+          FunctionUtils.log('fetchRoom error ===== ${data['error']}');
         }
       } else {
-        print('fetchRoom statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchRoom statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchRoom try catch error ===== $e');
+      FunctionUtils.log('fetchRoom try catch error ===== $e');
     }
     return null;
   }
@@ -272,20 +272,20 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('room_messages') && !data.containsKey('error')) {
           List<Message> messages = [];
           for (var roomMessage in data['room_messages']) {
             Member? talkMember;
-            //print(talkRoom.talkMembers.length);
+            //FunctionUtils.log(talkRoom.talkMembers.length);
             for(var member in talkRoom.talkMembers){
-              //print(member.name);
-              //print(member.id);
+              //FunctionUtils.log(member.name);
+              //FunctionUtils.log(member.id);
               if(roomMessage['member_id_from'] == member.id){
                 talkMember = member;
               }
             }
-            print(talkMember);
+            FunctionUtils.log(talkMember);
             talkMember ??= Member(
               id: '',
               name: '削除されたユーザー',
@@ -323,15 +323,15 @@ class ApiMessages {
           }
           return messages;
         } else if(data.containsKey('error')){
-          print('fetchMessages error ===== ${data['error']}');
+          FunctionUtils.log('fetchMessages error ===== ${data['error']}');
         } else{
-          print('fetchMessages empty');
+          FunctionUtils.log('fetchMessages empty');
         }
       } else {
-        print('fetchMessages statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchMessages statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchMessages try catch error ===== $e');
+      FunctionUtils.log('fetchMessages try catch error ===== $e');
     }
     return null;
   }
@@ -355,18 +355,18 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (!data.containsKey('error')) {
-          print('メッセージの送信成功');
+          FunctionUtils.log('メッセージの送信成功');
           return true;
         } else {
-          print('sendMessage error ===== ${data['error']}');
+          FunctionUtils.log('sendMessage error ===== ${data['error']}');
         }
       } else {
-        print('sendMessage statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('sendMessage statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('sendMessage try catch error ===== $e');
+      FunctionUtils.log('sendMessage try catch error ===== $e');
     }
     return false;
   }
@@ -382,18 +382,18 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (!data.containsKey('error')) {
-          print('メッセージの削除成功');
+          FunctionUtils.log('メッセージの削除成功');
           return true;
         } else {
-          print('deleteMessage error ===== ${data['error']}');
+          FunctionUtils.log('deleteMessage error ===== ${data['error']}');
         }
       } else {
-        print('deleteMessage statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('deleteMessage statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('deleteMessage try catch error ===== $e');
+      FunctionUtils.log('deleteMessage try catch error ===== $e');
     }
     return false;
   }
@@ -414,10 +414,10 @@ class ApiMessages {
       request.fields['sender_to_id'] = sendToId;
       request.fields['file_length'] = files.length.toString();
 
-      // print('room_id:${request.fields['room_id']}');
-      // print('sender_from_id:${request.fields['sender_from_id']}');
-      // print('sender_to_id:${request.fields['sender_to_id']}');
-      // print('file_length:${request.fields['file_length']}');
+      // FunctionUtils.log('room_id:${request.fields['room_id']}');
+      // FunctionUtils.log('sender_from_id:${request.fields['sender_from_id']}');
+      // FunctionUtils.log('sender_to_id:${request.fields['sender_to_id']}');
+      // FunctionUtils.log('file_length:${request.fields['file_length']}');
 
       if (files is List<File>) {
         //$_FILES
@@ -425,7 +425,7 @@ class ApiMessages {
         for (var file in files) {
           var fileName = path.basename(file.path);
           request.fields['file${count}_name'] = fileName;
-          //print('file${count}_name:${request.fields['file${count}_name']}');
+          //FunctionUtils.log('file${count}_name:${request.fields['file${count}_name']}');
           var picture = http.MultipartFile.fromBytes(
             'file$count',
             file.readAsBytesSync(),
@@ -437,11 +437,11 @@ class ApiMessages {
         }
 
         var response = await request.send();
-        print(response.statusCode);
+        FunctionUtils.log(response.statusCode);
         if(response.statusCode == 200){
           var responseData = await response.stream.toBytes();
           var body = String.fromCharCodes(responseData);
-          print(body);
+          FunctionUtils.log(body);
           Map<String, dynamic> data = jsonDecode(body);
           if(!data.containsKey('error')) {
             return true;
@@ -458,7 +458,7 @@ class ApiMessages {
         return false;
       }
     } catch (e) {
-      print('sendUploadFile try catch error ===== $e');
+      FunctionUtils.log('sendUploadFile try catch error ===== $e');
     }
     return false;
   }
@@ -476,22 +476,22 @@ class ApiMessages {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('result')) {
           if(data['result'] == true) {
-            print('すべて既読');
+            FunctionUtils.log('すべて既読');
             return true;
           }else{
-            print('すべて既読失敗');
+            FunctionUtils.log('すべて既読失敗');
           }
         } else {
-          print('updateAllRead error ===== ${data['error']}');
+          FunctionUtils.log('updateAllRead error ===== ${data['error']}');
         }
       } else {
-        print('updateAllRead statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateAllRead statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateAllRead try catch error ===== $e');
+      FunctionUtils.log('updateAllRead try catch error ===== $e');
     }
     return false;
   }

@@ -1,5 +1,6 @@
 //**import 'package:audio_session/audio_session.dart';
 import 'package:conavi_message/utils/audio_common.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 //**import 'package:just_audio/just_audio.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/services.dart';
 class AudioViewPage extends StatefulWidget {
   final String url;
   final String fileName;
-  const AudioViewPage(this.url,this.fileName,{Key? key}) : super(key: key);
+  const AudioViewPage(this.url,this.fileName,{super.key});
 
   @override
   State<AudioViewPage> createState() => _AudioViewPageState();
@@ -35,7 +36,7 @@ class _AudioViewPageState extends State<AudioViewPage> with WidgetsBindingObserv
     // Listen to errors during playback.
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
-          print('A stream error occurred: $e');
+          FunctionUtils.log('A stream error occurred: $e');
         });
     // Try to load audio from a source and catch any errors.
     try {
@@ -43,7 +44,7 @@ class _AudioViewPageState extends State<AudioViewPage> with WidgetsBindingObserv
       /*await _player.setAudioSource(AudioSource.uri(Uri.parse(widget.url)));
       _player.play();*/
     } catch (e) {
-      print("Error loading audio source: $e");
+      FunctionUtils.log("Error loading audio source: $e");
     }
   }
 
@@ -232,30 +233,30 @@ class ControlButtons extends StatelessWidget {
 // ),
 // icon: ref.watch(message.file.iconAudioPlayerProvider),
 // onPressed: () async {
-// print('[id:${message.id}]:play:${message.file.audioPlayer!.playing}');
+// FunctionUtils.log('[id:${message.id}]:play:${message.file.audioPlayer!.playing}');
 // //再生
 // if(!message.file.audioPlayer!.playing){
-// print('[id:${message.id}]:play:start');
+// FunctionUtils.log('[id:${message.id}]:play:start');
 // //他の音声ファイルを停止
 // stopAudioPlayers(message.id);
 // //ボタンの切替
 // ref.read(message.file.isAudioPlayProvider.notifier).state = true;
 // //再生
 // await message.file.audioPlayer!.play();
-// print('[id:${message.id}]:play:end');
+// FunctionUtils.log('[id:${message.id}]:play:end');
 // //完了時に再セット
 // if(message.file.audioPlayer!.processingState == ProcessingState.completed) {
 // try {
 // await message.file.audioPlayer!.stop();
 // await message.file.audioPlayer!.setUrl(message.file.fileUrl);
-// print('[id:${message.id}]:play:set');
+// FunctionUtils.log('[id:${message.id}]:play:set');
 // } catch (e) {
-// print(e);
+// FunctionUtils.log(e);
 // }
 // //ボタンの切替
 // ref.read(message.file.isAudioPlayProvider.notifier).state = false;
 // }
-// print('[id:${message.id}]:play:finish');
+// FunctionUtils.log('[id:${message.id}]:play:finish');
 // }else{
 // //ボタンの切替
 // ref.read(message.file.isAudioPlayProvider.notifier).state  = false;
@@ -284,11 +285,11 @@ class ControlButtons extends StatelessWidget {
 // //ファイルの破棄
 // void disposeFile(){
 //   for (var key in _files.keys) {
-//     print('$key : ${_files[key]}');
+//     FunctionUtils.log('$key : ${_files[key]}');
 //     if(_files[key] != null) {
 //       if(_files[key]!.audioPlayer != null) _files[key]!.audioPlayer!.dispose();
 //       // if(_files[key]!.videoPlayerController != null) {
-//       //   print('video dispoce $key : ${_files[key]}');
+//       //   FunctionUtils.log('video dispoce $key : ${_files[key]}');
 //       //   _files[key]!.videoPlayerController!.pause();
 //       //   _files[key]!.videoPlayerController!.dispose();
 //       // }
@@ -299,16 +300,16 @@ class ControlButtons extends StatelessWidget {
 // //再生中の音声ファイルを停止
 // void stopAudioPlayers(String messageId){
 //   for (var key in _files.keys) {
-//     print('$key : ${_files[key]}');
+//     FunctionUtils.log('$key : ${_files[key]}');
 //     if(_files[key] != null) {
 //       if (_files[key]!.audioPlayer != null){
 //         if(_files[key]!.id != messageId){
-//           print('stopAudioPlayers:[id:${_files[key]!.id}]');
+//           FunctionUtils.log('stopAudioPlayers:[id:${_files[key]!.id}]');
 //           //ボタンを元に戻す
 //           ref.read(_files[key]!.isAudioPlayProvider.notifier).state  = false;
 //           //再生中の場合は停止
 //           if(_files[key]!.audioPlayer!.playing) {
-//             print('[id:${_files[key]!.id}]:stop');
+//             FunctionUtils.log('[id:${_files[key]!.id}]:stop');
 //             _files[key]!.audioPlayer!.stop();
 //           }
 //         }
@@ -320,12 +321,12 @@ class ControlButtons extends StatelessWidget {
 //   //   for (var message in talkMessageList) {
 //   //     if(message.file.audioPlayer != null){
 //   //       if(message.id != messageId){
-//   //         print('stopAudioPlayers:[id:${message.id}]');
+//   //         FunctionUtils.log('stopAudioPlayers:[id:${message.id}]');
 //   //         //ボタンを元に戻す
 //   //         ref.read(message.file.isAudioPlayProvider.notifier).state  = false;
 //   //         //再生中の場合は停止
 //   //         if(message.file.audioPlayer!.playing) {
-//   //           print('[id:${message.id}]:stop');
+//   //           FunctionUtils.log('[id:${message.id}]:stop');
 //   //           message.file.audioPlayer!.stop();
 //   //         }
 //   //       }

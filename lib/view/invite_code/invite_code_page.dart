@@ -190,7 +190,7 @@ class _InviteCodePageState extends ConsumerState<InviteCodePage> {
                                     );
                                     if(result is bool && result){
                                       _invitationCodeController.clear();
-                                      print('send!!');
+                                      FunctionUtils.log('send!!');
                                     }
                                   }else{
                                     Loading.error(message: '招待コードを発行してください');

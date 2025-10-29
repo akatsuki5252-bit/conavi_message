@@ -5,13 +5,10 @@ import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/model/group_message.dart';
 import 'package:conavi_message/model/group_message_file.dart';
 import 'package:conavi_message/model/member.dart';
-import 'package:conavi_message/model/message.dart';
 import 'package:conavi_message/model/talk_group_member.dart';
 import 'package:conavi_message/model/talk_group_room.dart';
 import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/utils/function_utils.dart';
-import 'package:conavi_message/utils/upload_file.dart';
-import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
@@ -34,9 +31,9 @@ class ApiGroupMessages{
       request.fields['group_name'] = groupName;
       request.fields['admin_member_id'] = adminMemberId;
 
-      // print('createGroupRoom-joined_member_ids:'+joinedMemberIds);
-      // print('createGroupRoom-group_name:'+groupName);
-      // print('createGroupRoom-admin_member_id:'+adminMemberId);
+      // FunctionUtils.log('createGroupRoom-joined_member_ids:'+joinedMemberIds);
+      // FunctionUtils.log('createGroupRoom-group_name:'+groupName);
+      // FunctionUtils.log('createGroupRoom-admin_member_id:'+adminMemberId);
 
       if (uploadFile is File) {
         //$_FILES
@@ -55,7 +52,7 @@ class ApiGroupMessages{
       if(response.statusCode == 200){
         var responseData = await response.stream.toBytes();
         var body = utf8.decode(responseData);
-        print(body);
+        FunctionUtils.log(body);
         Map<String, dynamic> data = jsonDecode(body);
         //キーの存在チェック
         if (data.containsKey('rooms') && !data.containsKey('error')) {
@@ -79,11 +76,11 @@ class ApiGroupMessages{
             }
           }
           // for (var roomMember in roomMembers) {
-          //   print(roomMember.id);
-          //   print(roomMember.state);
-          //   print(roomMember.isAdmin);
-          //   print(roomMember.createTime);
-          //   print(roomMember.updateTime);
+          //   FunctionUtils.log(roomMember.id);
+          //   FunctionUtils.log(roomMember.state);
+          //   FunctionUtils.log(roomMember.isAdmin);
+          //   FunctionUtils.log(roomMember.createTime);
+          //   FunctionUtils.log(roomMember.updateTime);
           // }
           var talkDateTime = DateTime.now(); //ルームの更新時刻を現在の時刻に設定（仮）
           //取得したルーム情報の作成・更新時刻を挿入
@@ -99,16 +96,16 @@ class ApiGroupMessages{
             modifiedTime: talkDateTime, //ルームの最新更新日付
           );
 
-          print('グループルーム作成・取得完了');
+          FunctionUtils.log('グループルーム作成・取得完了');
           return talkGroupRoom;
         }
       }else{
         //リクエスト失敗（※送信は成功）
-        print('createRoom statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createRoom statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createRoom try catch error ===== $e');
+      FunctionUtils.log('createRoom try catch error ===== $e');
     }
     return null;
   }
@@ -123,16 +120,16 @@ class ApiGroupMessages{
       var response = await http.post(url, body: {
         'member_id': myAccount.member.id,
       });
-      //print('fetchJoinedGroupRooms-member_id:'+myAccount.member.id);
+      //FunctionUtils.log('fetchJoinedGroupRooms-member_id:'+myAccount.member.id);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           List<TalkGroupRoom> talkRooms = [];
           //int count = 0;
           for (var room in data['rooms']) {
-            //print('count:'+count.toString());
-            //print(room);
+            //FunctionUtils.log('count:'+count.toString());
+            //FunctionUtils.log(room);
             if(room['room']['modified'] == null) continue;
             //参加メンバー
             List<TalkGroupMember> talkMembers = [];
@@ -191,7 +188,7 @@ class ApiGroupMessages{
               );
               talkRooms.add(talkRoom);
             }catch(e){
-              print('fetchJoinedGroupRooms room try catch error ===== $e');
+              FunctionUtils.log('fetchJoinedGroupRooms room try catch error ===== $e');
             }
             //count++;
           }
@@ -199,17 +196,17 @@ class ApiGroupMessages{
           //並び順
           talkRooms.sort((a, b) => b.modifiedTime.compareTo(a.modifiedTime));
 
-          //print('talkRooms-length'+talkRooms.length.toString());
+          //FunctionUtils.log('talkRooms-length'+talkRooms.length.toString());
 
           return talkRooms;
         } else {
-          print('fetchJoinedGroupRooms error ===== ${data['error']}');
+          FunctionUtils.log('fetchJoinedGroupRooms error ===== ${data['error']}');
         }
       } else {
-        print('fetchJoinedGroupRooms statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchJoinedGroupRooms statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchJoinedGroupRooms try catch error ===== $e');
+      FunctionUtils.log('fetchJoinedGroupRooms try catch error ===== $e');
     }
     return null;
   }
@@ -227,10 +224,10 @@ class ApiGroupMessages{
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           var room = data['rooms'];
-          print(room);
+          FunctionUtils.log(room);
 
           //参加メンバー
           List<TalkGroupMember> talkMembers = [];
@@ -284,13 +281,13 @@ class ApiGroupMessages{
           return talkRoom;
 
         } else {
-          print('fetchGroupRoom error ===== ${data['error']}');
+          FunctionUtils.log('fetchGroupRoom error ===== ${data['error']}');
         }
       } else {
-        print('fetchGroupRoom statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchGroupRoom statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchGroupRoom try catch error ===== $e');
+      FunctionUtils.log('fetchGroupRoom try catch error ===== $e');
     }
     return null;
   }
@@ -306,17 +303,17 @@ class ApiGroupMessages{
         'room_id': talkRoom.roomId,
         'member_id': myAccount.member.id
       });
-      //print('room_id:'+talkRoom.roomId);
-      //print('member_id:'+myAccount.member.id);
+      //FunctionUtils.log('room_id:'+talkRoom.roomId);
+      //FunctionUtils.log('member_id:'+myAccount.member.id);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body) as Map<String, dynamic>;
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('room_messages') && !data.containsKey('error')) {
           List<GroupMessage> messages = [];
           for (var roomMessage in data['room_messages']) {
             Member? talkMember;
-            //print(talkRoom.talkMembers);
-            //print(roomMessage);
+            //FunctionUtils.log(talkRoom.talkMembers);
+            //FunctionUtils.log(roomMessage);
             for(var roomMember in talkRoom.talkMembers){
               if(roomMember.member != null) {
                 if (roomMessage['from_member_id'] == roomMember.member!.id) {
@@ -324,7 +321,7 @@ class ApiGroupMessages{
                 }
               }
             }
-            //print(talkMember);
+            //FunctionUtils.log(talkMember);
             talkMember ??= Member(
               id: '',
               name: '削除されたユーザー',
@@ -363,15 +360,15 @@ class ApiGroupMessages{
           }
           return messages;
         } else if(data.containsKey('error')){
-          print('fetchGroupMessages error ===== ${data['error']}');
+          FunctionUtils.log('fetchGroupMessages error ===== ${data['error']}');
         } else{
-          print('fetchGroupMessages empty');
+          FunctionUtils.log('fetchGroupMessages empty');
         }
       } else {
-        print('fetchGroupMessages statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchGroupMessages statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchGroupMessages try catch error ===== $e');
+      FunctionUtils.log('fetchGroupMessages try catch error ===== $e');
     }
     return null;
   }
@@ -388,7 +385,7 @@ class ApiGroupMessages{
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if (data.containsKey('rooms') && !data.containsKey('error')) {
           //参加メンバー
           List<TalkGroupMember> talkMembers = [];
@@ -428,13 +425,13 @@ class ApiGroupMessages{
           }
           return talkMembers;
         } else {
-          print('fetchGroupMembers error ===== ${data['error']}');
+          FunctionUtils.log('fetchGroupMembers error ===== ${data['error']}');
         }
       } else {
-        print('fetchGroupMembers statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchGroupMembers statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchGroupMembers try catch error ===== $e');
+      FunctionUtils.log('fetchGroupMembers try catch error ===== $e');
     }
     return null;
   }
@@ -456,23 +453,23 @@ class ApiGroupMessages{
         'delete_member_id': deleteMemberId,
       });
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('result')) {
-          print('グループ参加・拒否更新');
+          FunctionUtils.log('グループ参加・拒否更新');
           if(data['result'] == true) {
             return true;
           }else{
             return false;
           }
         } else {
-          print('updateRoomMemberState error ===== ${data['error']}');
+          FunctionUtils.log('updateRoomMemberState error ===== ${data['error']}');
         }
       }else{
-        print('updateRoomMemberState statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateRoomMemberState statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateRoomMemberState try catch error ===== $e');
+      FunctionUtils.log('updateRoomMemberState try catch error ===== $e');
     }
     return null;
   }
@@ -491,26 +488,26 @@ class ApiGroupMessages{
         'member_id': memberId,
         'delete_member_id': deleteMemberId,
       });
-      print('member_id:$memberId');
-      print('delete_member_id:$deleteMemberId');
+      FunctionUtils.log('member_id:$memberId');
+      FunctionUtils.log('delete_member_id:$deleteMemberId');
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('result')) {
-          print('グループから退会');
+          FunctionUtils.log('グループから退会');
           if(data['result'] == true) {
             return true;
           }else{
             return false;
           }
         } else {
-          print('updateRoomMemberState error ===== ${data['error']}');
+          FunctionUtils.log('updateRoomMemberState error ===== ${data['error']}');
         }
       }else{
-        print('updateRoomMemberState statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateRoomMemberState statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateRoomMemberState try catch error ===== $e');
+      FunctionUtils.log('updateRoomMemberState try catch error ===== $e');
     }
     return null;
   }
@@ -525,34 +522,34 @@ class ApiGroupMessages{
     try {
       //接続先URL
       var url = Uri.parse('$domain/api/message/invite_group_members.php');
-      //print(url);
+      //FunctionUtils.log(url);
       var response = await http.post(url, body: {
         'room_id': roomId,
         'invite_joined_member_ids': inviteJoinedMemberIds,
         'invite_member_id': inviteMemberId,
       });
 
-      //print(response);
+      //FunctionUtils.log(response);
 
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('result')) {
-          print('グループに招待');
+          FunctionUtils.log('グループに招待');
           if(data['result'] == true) {
             return true;
           }else{
             return false;
           }
         } else {
-          print('inviteGroupMembers error ===== ${data['error']}');
+          FunctionUtils.log('inviteGroupMembers error ===== ${data['error']}');
         }
       }else{
-        print('inviteGroupMembers statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('inviteGroupMembers statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('inviteGroupMembers try catch error ===== $e');
+      FunctionUtils.log('inviteGroupMembers try catch error ===== $e');
     }
     return null;
   }
@@ -573,18 +570,18 @@ class ApiGroupMessages{
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (!data.containsKey('error')) {
-          print('メッセージの送信成功');
+          FunctionUtils.log('メッセージの送信成功');
           return true;
         } else {
-          print('sendMessage error ===== ${data['error']}');
+          FunctionUtils.log('sendMessage error ===== ${data['error']}');
         }
       } else {
-        print('sendMessage statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('sendMessage statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('sendMessage try catch error ===== $e');
+      FunctionUtils.log('sendMessage try catch error ===== $e');
     }
     return false;
   }
@@ -604,10 +601,10 @@ class ApiGroupMessages{
       request.fields['send_from_id'] = sendMemberFromId;
       request.fields['file_length'] = files.length.toString();
 
-      // print('room_id:${request.fields['room_id']}');
-      // print('sender_from_id:${request.fields['sender_from_id']}');
-      // print('sender_to_id:${request.fields['sender_to_id']}');
-      // print('file_length:${request.fields['file_length']}');
+      // FunctionUtils.log('room_id:${request.fields['room_id']}');
+      // FunctionUtils.log('sender_from_id:${request.fields['sender_from_id']}');
+      // FunctionUtils.log('sender_to_id:${request.fields['sender_to_id']}');
+      // FunctionUtils.log('file_length:${request.fields['file_length']}');
 
       if (files is List<File>) {
         //$_FILES
@@ -615,7 +612,7 @@ class ApiGroupMessages{
         for (var file in files) {
           var fileName = path.basename(file.path);
           request.fields['file${count}_name'] = fileName;
-          //print('file${count}_name:${request.fields['file${count}_name']}');
+          //FunctionUtils.log('file${count}_name:${request.fields['file${count}_name']}');
           var picture = http.MultipartFile.fromBytes(
             'file$count',
             file.readAsBytesSync(),
@@ -627,28 +624,28 @@ class ApiGroupMessages{
         }
 
         var response = await request.send();
-        print(response.statusCode);
+        FunctionUtils.log(response.statusCode);
         if(response.statusCode == 200){
           var responseData = await response.stream.toBytes();
           var body = String.fromCharCodes(responseData);
-          print(body);
+          FunctionUtils.log(body);
           Map<String, dynamic> data = jsonDecode(body);
           if(!data.containsKey('error')) {
             return true;
           }else{
-            print('sendUploadFile error ===== ${data['error']}');
+            FunctionUtils.log('sendUploadFile error ===== ${data['error']}');
             return false;
           }
         }else{
-          print('sendUploadFile statusCode error ===== ${response.statusCode}');
+          FunctionUtils.log('sendUploadFile statusCode error ===== ${response.statusCode}');
           return false;
         }
       }else{
-        print('sendUploadFile error ===== no List<File>');
+        FunctionUtils.log('sendUploadFile error ===== no List<File>');
         return false;
       }
     } catch (e) {
-      print('sendUploadFile try catch error ===== $e');
+      FunctionUtils.log('sendUploadFile try catch error ===== $e');
     }
     return false;
   }
@@ -682,22 +679,22 @@ class ApiGroupMessages{
         request.files.add(picture);
       }
       var response = await request.send();
-      //print(response.statusCode);
+      //FunctionUtils.log(response.statusCode);
       if(response.statusCode == 200){
         var responseData = await response.stream.toBytes();
         var body = String.fromCharCodes(responseData);
-        print(body);
+        FunctionUtils.log(body);
         Map<String, dynamic> data = jsonDecode(body);
         if(!data.containsKey('error')) {
           return true;
         }else{
-          print('updateGroupImageFile error ===== ${data['error']}');
+          FunctionUtils.log('updateGroupImageFile error ===== ${data['error']}');
         }
       }else{
-        print('updateGroupImageFile statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateGroupImageFile statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateGroupImageFile try catch error ===== $e');
+      FunctionUtils.log('updateGroupImageFile try catch error ===== $e');
     }
     return false;
   }

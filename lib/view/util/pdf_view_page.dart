@@ -46,7 +46,7 @@ class _PdfViewPageState extends ConsumerState<PdfViewPage> {
           //     await Dio().download(widget.pdfView.url, filePath);
           //     var result = await GallerySaver.saveImage(filePath,albumName: 'CONAVI');
           //
-          //     print(result);
+          //     FunctionUtils.log(result);
           //     if(result != null && result){
           //       EasyLoading.dismiss();
           //     }else{
@@ -72,7 +72,7 @@ class _PdfViewPageState extends ConsumerState<PdfViewPage> {
           //     );
           //     final http.Response response = await http.get(Uri.parse(widget.pdfView.url));
           //     final result = await ImageGallerySaver.saveImage(response.bodyBytes);
-          //     print(result);
+          //     FunctionUtils.log(result);
           //     if(result['isSuccess'] != null && result['isSuccess']){
           //       EasyLoading.dismiss();
           //     }else{

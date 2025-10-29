@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -49,9 +50,9 @@ class _TestFilePageState extends ConsumerState<TestFilePage> {
                               /**FilePickerResult? result = await FilePicker.platform.pickFiles(allowMultiple: true);
                               if (result == null) throw Exception('file:null');
                               List<File> files = result.paths.map((path) => File(path!)).toList();
-                              print(files);**/
+                              FunctionUtils.log(files);**/
                             } catch (e) {
-                              print('Failed to pick file: $e');
+                              FunctionUtils.log('Failed to pick file: $e');
                             }
                           }
                       ),
@@ -82,9 +83,9 @@ class _TestFilePageState extends ConsumerState<TestFilePage> {
                                   );
                                   if (result == null) throw Exception('file:null');
                                   List<File> files = result.paths.map((path) => File(path!)).toList();
-                                  print(files);**/
+                                  FunctionUtils.log(files);**/
                                 } catch (e) {
-                                  print('Failed to pick file: $e');
+                                  FunctionUtils.log('Failed to pick file: $e');
                                 }
                               }
                           ),
@@ -109,9 +110,9 @@ class _TestFilePageState extends ConsumerState<TestFilePage> {
                                   );
                                   if (result == null) throw Exception('file:null');
                                   List<File> files = result.paths.map((path) => File(path!)).toList();
-                                  print(files);*/
+                                  FunctionUtils.log(files);*/
                                 } catch (e) {
-                                  print('Failed to pick file: $e');
+                                  FunctionUtils.log('Failed to pick file: $e');
                                 }
                               }
                           ),
@@ -133,9 +134,9 @@ class _TestFilePageState extends ConsumerState<TestFilePage> {
                                   if (pickedFile == null) throw Exception('file:null');
                                   File file = File(pickedFile.path);
                                   await EasyLoading.showToast(file.path);
-                                  print(file);
+                                  FunctionUtils.log(file);
                                 } catch (e) {
-                                  print('Failed to pick file: $e');
+                                  FunctionUtils.log('Failed to pick file: $e');
                                 }
                               }
                           ),

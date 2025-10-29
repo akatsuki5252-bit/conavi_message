@@ -43,7 +43,7 @@ class _ChatPageState extends State<ChatPage> {
           stream: RoomFirestore.fetchJoinedRoomSnapshot(myAccount.member.id),
           builder: (context, streamSnapshot) {
             if (streamSnapshot.hasData) {
-              print(streamSnapshot.data);
+              FunctionUtils.log(streamSnapshot.data);
               return FutureBuilder<List<TalkRoom>?>(
                   future: RoomFirestore.fetchJoinedRooms(
                       snapshot: streamSnapshot.data!,

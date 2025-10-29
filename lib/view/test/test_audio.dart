@@ -1,4 +1,5 @@
 //**import 'package:audio_session/audio_session.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/view/test/test_audio_common.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,7 +7,7 @@ import 'package:flutter/services.dart';
 //**import 'package:rxdart/rxdart.dart';
 
 class TestAudioPage extends StatefulWidget {
-  const TestAudioPage({Key? key}) : super(key: key);
+  const TestAudioPage({super.key});
 
   @override
   TestAudioPageState createState() => TestAudioPageState();
@@ -33,7 +34,7 @@ class TestAudioPageState extends State<TestAudioPage> with WidgetsBindingObserve
     // Listen to errors during playback.
     _player.playbackEventStream.listen((event) {},
         onError: (Object e, StackTrace stackTrace) {
-          print('A stream error occurred: $e');
+          FunctionUtils.log('A stream error occurred: $e');
         });
     // Try to load audio from a source and catch any errors.
     try {
@@ -42,7 +43,7 @@ class TestAudioPageState extends State<TestAudioPage> with WidgetsBindingObserve
           "https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3")));
       _player.play();*/
     } catch (e) {
-      print("Error loading audio source: $e");
+      FunctionUtils.log("Error loading audio source: $e");
     }
   }
 

@@ -56,7 +56,7 @@ class Authentication {
       userSetting: UserSetting(),
     );
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    print('アプリバージョン：${packageInfo.version}');
+    FunctionUtils.log('アプリバージョン：${packageInfo.version}');
     //初回ログインのみ更新
     if(appToken.isEmpty) {
       //FCMトークンを更新
@@ -67,13 +67,13 @@ class Authentication {
       if(Platform.isAndroid){
         AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
         deviceInfoText = 'Android/${androidInfo.model}/${androidInfo.version.sdkInt}/${androidInfo.manufacturer}';
-        print('Model: ${androidInfo.model}');
-        print('Android Version: ${androidInfo.version.sdkInt}');
-        print('Manufacturer: ${androidInfo.manufacturer}');
+        FunctionUtils.log('Model: ${androidInfo.model}');
+        FunctionUtils.log('Android Version: ${androidInfo.version.sdkInt}');
+        FunctionUtils.log('Manufacturer: ${androidInfo.manufacturer}');
       }else if(Platform.isIOS){
         IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
         deviceInfoText = 'IOS/${iosInfo.systemName}/${iosInfo.systemVersion}/${iosInfo.model}/${iosInfo.utsname.machine}';
-        print('Device: ${iosInfo.utsname.machine}');
+        FunctionUtils.log('Device: ${iosInfo.utsname.machine}');
       }else {
         deviceInfoText = 'Unknown/${Platform.operatingSystem}'; // ← 空送信対策
       }
@@ -86,11 +86,11 @@ class Authentication {
     }
     //アプリバージョンチェック
     account.userSetting.isAppUpdate = await ApiDomains.checkAppVersion(version: packageInfo.version);
-    print('アプリ強制更新：${account.userSetting.isAppUpdate}');
+    FunctionUtils.log('アプリ強制更新：${account.userSetting.isAppUpdate}');
     //プリファレンスに保存
     await SharedPrefs.setAuth(domainId: conaviId, appToken: member.appToken!);
-    print('appToken:${member.appToken!}');
-    print('認証完了');
+    FunctionUtils.log('appToken:${member.appToken!}');
+    FunctionUtils.log('認証完了');
 
     result.isSuccess = true;
     result.account = account;
@@ -104,18 +104,18 @@ class Authentication {
         'domain_id': domainId,
       });
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if(data.containsKey('domain') && !data.containsKey('error')){
           return data['domain'];
         }else{
-          print('domainSignIn error ===== ${data['error']}');
+          FunctionUtils.log('domainSignIn error ===== ${data['error']}');
         }
       }else{
-        print('domainSignIn statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('domainSignIn statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('domainSignIn try catch error ===== $e');
+      FunctionUtils.log('domainSignIn try catch error ===== $e');
     }
     return null;
   }
@@ -135,7 +135,7 @@ class Authentication {
         'conavi_id': conaviId,
       });
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if(data.containsKey('member') && !data.containsKey('error')) {
           Member member = Member(
@@ -149,13 +149,13 @@ class Authentication {
           );
           return member;
         }else{
-          print('emailSignIn error ===== ${data['error']}');
+          FunctionUtils.log('emailSignIn error ===== ${data['error']}');
         }
       }else{
-        print('emailSignIn statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('emailSignIn statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('emailSignIn try catch error ===== $e');
+      FunctionUtils.log('emailSignIn try catch error ===== $e');
     }
 
     return null;
@@ -167,8 +167,8 @@ class Authentication {
     await SharedPrefs.setInstance();
     String conaviId = SharedPrefs.fetchDomainId();
     String appToken = SharedPrefs.fetchAppToken();
-    print("domain:$conaviId");
-    print("appToken:$appToken");
+    FunctionUtils.log("domain:$conaviId");
+    FunctionUtils.log("appToken:$appToken");
 
     //ドメインId、アプリトークンが空で無ければアカウント情報を取得
     if(conaviId.isNotEmpty && appToken.isNotEmpty) {
@@ -193,8 +193,8 @@ class Authentication {
       //   //ref.read(authProvider.notifier).state  = account;
       //   /*final member = Member(name: 'aaa', imagePath: '', selfIntroduction: '');
       //   myAccount.member = member;
-      //   print(myAccount.member);*/
-      //   //print('UserSetting:${account.userSetting.selectedBottomMenuIndex}');
+      //   FunctionUtils.logmyAccount.member);*/
+      //   //FunctionUtils.log('UserSetting:${account.userSetting.selectedBottomMenuIndex}');
       //   ref.read(userProvider.notifier).state  = account.member;
       //   ref.read(domainProvider.notifier).state  = account.domain;
       //   ref.read(userSettingProvider.notifier).state = account.userSetting;
@@ -228,19 +228,19 @@ class Authentication {
         'email': email,
       });
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if(data.containsKey('result')) result.isSuccess = data['result'];
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createAuthCode error ===== ${data['error']}');
+          FunctionUtils.log('createAuthCode error ===== ${data['error']}');
         }
         return result;
       }else{
-        print('createAuthCode statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createAuthCode statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('createAuthCode try catch error ===== $e');
+      FunctionUtils.log('createAuthCode try catch error ===== $e');
     }
     return null;
   }
@@ -256,18 +256,18 @@ class Authentication {
         'code': code,
       });
       if (response.statusCode == 200) {
-        print(response.body);
+        FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if(data.containsKey('result') && !data.containsKey('error')){
           return true;
         }else{
-          print('createAuthCode error ===== ${data['error']}');
+          FunctionUtils.log('createAuthCode error ===== ${data['error']}');
         }
       }else{
-        print('createAuthCode statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createAuthCode statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('createAuthCode try catch error ===== $e');
+      FunctionUtils.log('createAuthCode try catch error ===== $e');
     }
     return false;
   }

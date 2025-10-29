@@ -246,7 +246,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
                                           var index = int.parse(value.toString());
                                           var img = File(pickerFile.file.path);
                                           final fileSize = FunctionUtils.formatFileSize(img.readAsBytesSync().lengthInBytes.toDouble());
-                                          //print(imgFile.isCompress);
+                                          //FunctionUtils.log(imgFile.isCompress);
                                           setState(() {
                                             _radioIndex = index;
                                             _isCompressButton = pickerFile.isCompressFlag;
@@ -316,7 +316,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
                           });
                         }
                       } catch (e) {
-                        print('Failed to pick image: $e');
+                        FunctionUtils.log('Failed to pick image: $e');
                       } finally {
                         Loading.dismiss();
                       }
@@ -420,7 +420,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
       }
       if (result == null) throw Exception('file:null');
       List<File> files = result.paths.map((path) => File(path!)).toList();
-      print(files);
+      FunctionUtils.log(files);
 
       // if(_multipleType == true) {
       //   _pickedFileList = await ImagePicker().pickMultiImage();
@@ -428,7 +428,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
       //   final image  = await ImagePicker().pickImage(source: ImageSource.gallery);
       //   if (image == null) return;
       //   _pickedFileList = [image];
-      //   print(_pickedFileList);
+      //   FunctionUtils.log(_pickedFileList);
       // }
       //
       // if(_pickedFileList == null) return;
@@ -449,8 +449,8 @@ class _FilePickerPageState extends State<FilePickerPage>{
         String date = outputFormat.format(now);
         String renamePath = path.join(dir, '$date-${index+1}$ext');
         File renameFile = file.renameSync(renamePath);  //名前の変更
-        print('rename前: ${file.path}');
-        print('rename後: ${renameFile.path}');
+        FunctionUtils.log('rename前: ${file.path}');
+        FunctionUtils.log('rename後: ${renameFile.path}');
 
         PickerFile pickerFile = PickerFile(file: renameFile);
         if(pickerFile.isImageFlag) {
@@ -467,7 +467,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
         compressFiles.add(pickerFile);
         index++;
       }
-      //print(pickedFileList);
+      //FunctionUtils.log(pickedFileList);
       setState(() {
         _pickerFiles = compressFiles;
         //単一の画像の場合、圧縮ボタン、ファイルサイズを初期表示させる
@@ -480,7 +480,7 @@ class _FilePickerPageState extends State<FilePickerPage>{
         }
       });
     } catch (e) {
-      print('Failed to pick file: $e');
+      FunctionUtils.log('Failed to pick file: $e');
       setState(() {
         _pickerFiles = null;
         _isCompressButton = false;
@@ -489,15 +489,15 @@ class _FilePickerPageState extends State<FilePickerPage>{
       //ローディングを終了
       Loading.dismiss();
     }
-    print(_pickerFiles);
-    print('pickFiles:end');
+    FunctionUtils.log(_pickerFiles);
+    FunctionUtils.log('pickFiles:end');
   }
 
   Future<Uint8List?> compressFile(File file,int quality) async {
-    print('compressFile');
+    FunctionUtils.log('compressFile');
     final size = ImageSizeGetter.getSize(FileInput(file));
     final fileSize = file.readAsBytesSync().lengthInBytes.toDouble();
-    print('width:${size.width},height:${size.height},size:${fileSize}');
+    FunctionUtils.log('width:${size.width},height:${size.height},size:${fileSize}');
     final result = await FlutterImageCompress.compressWithFile(
       file.absolute.path,
       minWidth: size.width,

@@ -1,3 +1,4 @@
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter/material.dart';
 
 class TestNavigationA extends StatefulWidget {
@@ -25,7 +26,7 @@ class _TestNavigationAState extends State<TestNavigationA> {
                   builder: (context) => const TestNavigationB()
               ),
             );
-            print(result);
+            FunctionUtils.log(result);
           },
           style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.teal),
@@ -65,7 +66,7 @@ class _TestNavigationBState extends State<TestNavigationB> {
                   ),
                 );
                 if(result != null){
-                  print(result);
+                  FunctionUtils.log(result);
                   Navigator.pop(context,'B2');
                 }
               },

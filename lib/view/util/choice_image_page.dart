@@ -174,7 +174,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
                               ImageFile imgFile = _imageFileList![index];
                               //var img = File(imgFile.file.path);
                               //final fileSize = FunctionUtils.formatFileSize(img.readAsBytesSync().lengthInBytes.toDouble());
-                              //print(fileSize);
+                              //FunctionUtils.log(fileSize);
                               return Stack(
                                 alignment: Alignment.topRight,
                                 children: [
@@ -211,7 +211,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
                                           var index = int.parse(value.toString());
                                           var img = File(imgFile.file.path);
                                           final fileSize = FunctionUtils.formatFileSize(img.readAsBytesSync().lengthInBytes.toDouble());
-                                          //print(imgFile.isCompress);
+                                          //FunctionUtils.log(imgFile.isCompress);
                                           setState(() {
                                             _radioIndex = index;
                                             _isCompressButton = imgFile.isCompress;
@@ -280,7 +280,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
                             if (fixedImageBytesO == null) return;
                             imgFile.file.writeAsBytesSync(fixedImageBytesO);
                             fileSize = FunctionUtils.formatFileSize(imgFile.file.readAsBytesSync().lengthInBytes.toDouble());
-                            //print(fileSize);
+                            //FunctionUtils.log(fileSize);
                             imgFile.isCompress = false;
                           }
                           imgFile.isFileSizeOver = checkFileSize(imgFile.file.readAsBytesSync().lengthInBytes.toDouble(),_limitFileSize);
@@ -293,7 +293,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
                           if (fileSize != null) _selectedFileSize = fileSize;
                         });
                       } catch (e) {
-                        print('Failed to pick image: $e');
+                        FunctionUtils.log('Failed to pick image: $e');
                       } finally {
                         EasyLoading.dismiss();
                       }
@@ -345,7 +345,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
       dismissOnTap: false,
       maskType: EasyLoadingMaskType.black,
     );
-    print('start');
+    FunctionUtils.log('start');
     try {
       if(_multipleType == true) {
         _pickedFileList = await ImagePicker().pickMultiImage();
@@ -353,7 +353,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
         final image  = await ImagePicker().pickImage(source: ImageSource.gallery);
         if (image == null) return;
         _pickedFileList = [image];
-        print(_pickedFileList);
+        FunctionUtils.log(_pickedFileList);
       }
 
       if(_pickedFileList == null) return;
@@ -374,8 +374,8 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
         String date = outputFormat.format(now);
         String newPath = path.join(dir, '${widget.fileName}_${date}_${index+1}$ext');
         File newFile = await file.renameSync(newPath);  //名前の変更
-        print('rename前: ${file.path}');
-        print('rename後: ${newFile.path}');
+        FunctionUtils.log('rename前: ${file.path}');
+        FunctionUtils.log('rename後: ${newFile.path}');
 
         ImageFile imgFile = ImageFile(file: newFile,isCompress: true);
 
@@ -389,7 +389,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
         compressFileList.add(imgFile);
         index++;
       }
-      //print(pickedFileList);
+      //FunctionUtils.log(pickedFileList);
       setState(() {
         _imageFileList = compressFileList;
         //単一の画像の場合、圧縮ボタン、ファイルサイズを初期表示させる
@@ -403,21 +403,21 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
       });
       isComplete = true;
     } catch (e) {
-      print('Failed to pick image: $e');
+      FunctionUtils.log('Failed to pick image: $e');
     } finally {
       if(!isComplete){
         //setState((){});
       }
       EasyLoading.dismiss();
     }
-    print('pickImage:end');
+    FunctionUtils.log('pickImage:end');
   }
 
   Future<Uint8List?> compressFile(File file,int quality) async {
-    print('compressFile');
+    FunctionUtils.log('compressFile');
     final size = ImageSizeGetter.getSize(FileInput(file));
     final fileSize = file.readAsBytesSync().lengthInBytes.toDouble();
-    print('width:${size.width},height:${size.height},size:${fileSize}');
+    FunctionUtils.log('width:${size.width},height:${size.height},size:${fileSize}');
     final result = await FlutterImageCompress.compressWithFile(
       file.absolute.path,
       minWidth: size.width,
@@ -432,7 +432,7 @@ class _ChoiceImagePageState extends State<ChoiceImagePage>{
   }
 
   bool checkFileSize(double size,double limitSize) {
-    //print(size);
+    //FunctionUtils.log(size);
     //MB
     double m = ((size / 1024.0) / 1024.0);
     if (m > 1) {

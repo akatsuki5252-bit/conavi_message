@@ -11,6 +11,7 @@ import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/setting/user_setting.dart';
 import 'package:conavi_message/utils/custom_alert_dialog.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/widget_dialogs.dart';
 import 'package:conavi_message/view/message/select_message_member_page.dart';
@@ -67,7 +68,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
   void initState() {
     super.initState();
     // final userSetting = ref.read(userSettingProvider);
-    // //print('initState:${userSetting.currentMessageTabIndex}');
+    // //FunctionUtils.log('initState:${userSetting.currentMessageTabIndex}');
     // _tabController = TabController(vsync: this, length: _tab.length, initialIndex: userSetting.currentMessageTabIndex);
     // if(userSetting.currentMessageTabIndex == MessageTab.member.index){
     //   ref.refresh(membersFutureProvider);
@@ -124,7 +125,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
                     break;
                   //グループメッセージを作成
                   case MessageType.group:
-                    //print("add:group");
+                    //FunctionUtils.log("add:group");
                     //グループ設定で使用するグループ名・グループ画像・グループ参加メンバー変数を初期化
                     ref.invalidate(createGroupNameProvider);
                     ref.invalidate(createGroupImagePathProvider);
@@ -150,11 +151,11 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
                 switch(result){
                   ///メッセージを並び替える
                   case MessageSetting.sort:
-                    print(myAccount.userSetting.currentMessageSort);
+                    FunctionUtils.log(myAccount.userSetting.currentMessageSort);
                     final MessageSort? selectedSort = await showDialog<MessageSort>(context: context, builder: (_) {
                       return WidgetDialogs.showMessageRoomSortDialog(context,myAccount.userSetting.currentMessageSort);
                     });
-                    print(selectedSort);
+                    FunctionUtils.log(selectedSort);
                     if(selectedSort is MessageSort){
                       if(myAccount.userSetting.currentMessageSort != selectedSort) {
                         ref.read(selectedMessageSortProvider.notifier).state = selectedSort;
@@ -181,7 +182,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
                           Loading.show(message: '処理中...', isDismissOnTap: false);
                           //すべて既読
                           bool result = await ApiMessages.updateAllRead(domain: myAccount.domain.url, memberId: myAccount.member.id);
-                          print(result);
+                          FunctionUtils.log(result);
                           if(result){
                             ref.refresh(talkRoomsFutureProvider);
                             ref.refresh(talkGroupRoomsFutureProvider);
@@ -228,7 +229,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
               ),
               onTap: (index){
                 ref.read(selectedMessageTabIndexProvider.notifier).state = index;
-                //print(myAccount.userSetting.currentMessageTabIndex);
+                //FunctionUtils.log(myAccount.userSetting.currentMessageTabIndex);
                 if(index == MessageTab.member.index){
                   ref.refresh(membersFutureProvider);
                 }else if(index == MessageTab.message.index){
@@ -236,7 +237,7 @@ class _MessageScreenState extends ConsumerState<MessageScreen> with SingleTicker
                 } if(index == MessageTab.groupMessage.index){
                   ref.refresh(talkGroupRoomsFutureProvider);
                 }
-                //print('TabBar_onTap:$index');
+                //FunctionUtils.log('TabBar_onTap:$index');
               },
             ),
           ),

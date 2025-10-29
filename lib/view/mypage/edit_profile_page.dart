@@ -112,7 +112,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               }
                             }
                             if(imageFile != null){
-                              print(imageFile);
+                              FunctionUtils.log(imageFile);
                               //ローディングメッセージを表示
                               Loading.show(message: '処理中...', isDismissOnTap: false);
                               bool result = await ApiMembers.uploadMemberFile(
@@ -120,7 +120,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                 uid: myAccount.member.id,
                                 uploadFile: imageFile,
                               );
-                              print(result);
+                              FunctionUtils.log(result);
                               if(result){
                                 setProfile();
                                 _isChanged = true;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:conavi_message/setting/result.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:http/http.dart' as http;
 
 class ApiCommunitys {
@@ -20,13 +21,13 @@ class ApiCommunitys {
         'email': email,
       });
 
-      print('community_name:$communityName');
-      print('email:$email');
+      FunctionUtils.log('community_name:$communityName');
+      FunctionUtils.log('email:$email');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
           if(data.containsKey('conavi_id')){
@@ -35,18 +36,18 @@ class ApiCommunitys {
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createCommunity error ===== ${data['error']}');
+          FunctionUtils.log('createCommunity error ===== ${data['error']}');
         }
-        print(result.isSuccess);
-        print(result.data['conaviId']);
+        FunctionUtils.log(result.isSuccess);
+        FunctionUtils.log(result.data['conaviId']);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createCommunity statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createCommunity statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createCommunity try catch error ===== $e');
+      FunctionUtils.log('createCommunity try catch error ===== $e');
     }
     return null;
   }
@@ -69,31 +70,31 @@ class ApiCommunitys {
         'conavi_id': conaviId,
       });
 
-      print('name:$name');
-      print('email:$email');
-      print('password:$password');
-      print('conavi_id:$conaviId');
+      FunctionUtils.log('name:$name');
+      FunctionUtils.log('email:$email');
+      FunctionUtils.log('password:$password');
+      FunctionUtils.log('conavi_id:$conaviId');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createCommunityMember error ===== ${data['error']}');
+          FunctionUtils.log('createCommunityMember error ===== ${data['error']}');
         }
-        print(result.isSuccess);
+        FunctionUtils.log(result.isSuccess);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createCommunityMember statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createCommunityMember statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createCommunityMember try catch error ===== $e');
+      FunctionUtils.log('createCommunityMember try catch error ===== $e');
     }
     return null;
   }
@@ -111,28 +112,28 @@ class ApiCommunitys {
         'email': email,
       });
 
-      print('email:$email');
+      FunctionUtils.log('email:$email');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('checkEmail error ===== ${data['error']}');
+          FunctionUtils.log('checkEmail error ===== ${data['error']}');
         }
-        print(result.isSuccess);
+        FunctionUtils.log(result.isSuccess);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('checkEmail statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('checkEmail statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('checkEmail try catch error ===== $e');
+      FunctionUtils.log('checkEmail try catch error ===== $e');
     }
     return null;
   }

@@ -120,7 +120,7 @@ class _EditProfileNamePageState extends ConsumerState<EditProfileNamePage> {
                             name: _nameController.text,
                             selfIntroduction: '',
                           );
-                          print(result);
+                          FunctionUtils.log(result);
                           if(result){
                             _isSave = true;
                             //ローディングを終了

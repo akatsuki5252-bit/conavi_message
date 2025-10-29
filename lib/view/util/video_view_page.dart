@@ -156,7 +156,7 @@ class _VideoViewPageState extends ConsumerState<VideoViewPage>{
               //                 // await Dio().download(widget.imageUrl, filePath);
               //                 // final result = await ImageGallerySaver.saveFile(filePath);
               //
-              //                 print(result);
+              //                 FunctionUtils.log(result);
               //                 if(result != null && result){
               //                   EasyLoading.dismiss();
               //                 }else{
@@ -183,7 +183,7 @@ class _VideoViewPageState extends ConsumerState<VideoViewPage>{
               //                 );
               //                 final http.Response response = await http.get(Uri.parse(widget.videoView.url));
               //                 final result = await ImageGallerySaver.saveImage(response.bodyBytes);
-              //                 print(result);
+              //                 FunctionUtils.log(result);
               //                 if(result['isSuccess'] != null && result['isSuccess']){
               //                   EasyLoading.dismiss();
               //                 }else{

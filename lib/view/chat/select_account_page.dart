@@ -3,6 +3,7 @@ import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter/material.dart';
 
 class SelectAccountPage extends StatefulWidget {
@@ -57,7 +58,7 @@ class _SelectAccountPageState extends State<SelectAccountPage> {
               } else {
                 _memberIds.add(myAccount.member.id);
                 for (var element in _memberIds) {
-                  print(element);
+                  FunctionUtils.log(element);
                 }
                 var result = await RoomFirestore.createRoom(_memberIds);
                 if (result) {

@@ -187,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
   //           ),
   //         ),
   //         MessageBar(
-  //           onSend: (_) => print(_),
+  //           onSend: (_) => FunctionUtils.log_),
   //           actions: [
   //             InkWell(
   //               child: Icon(

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/local_notifications.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -47,7 +48,7 @@ class FirebaseCloudMessaging {
     if (Platform.isIOS) {
       final settings = await messaging.requestPermission();
       if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-        debugPrint('🔕 通知が拒否されているため、FCMトークンを取得しません');
+        FunctionUtils.log('🔕 通知が拒否されているため、FCMトークンを取得しません');
         return '';
       }
       String? apnsToken;
@@ -55,15 +56,15 @@ class FirebaseCloudMessaging {
       while (apnsToken == null && retry < 5) {
         apnsToken = await FirebaseMessaging.instance.getAPNSToken();
         if (apnsToken != null) {
-          debugPrint('✅ APNsトークン取得成功: $apnsToken');
+          FunctionUtils.log('✅ APNsトークン取得成功: $apnsToken');
           break;
         }
         retry++;
-        debugPrint('⚠️ まだAPNsトークンがnull、再試行 ($retry/10)');
+        FunctionUtils.log('⚠️ まだAPNsトークンがnull、再試行 ($retry/10)');
         await Future.delayed(const Duration(seconds: 1)); // ←ここで1秒待つ
       }
       if (apnsToken == null) {
-        debugPrint('⚠️ APNsトークンが未取得');
+        FunctionUtils.log('⚠️ APNsトークンが未取得');
       }
     }
 
@@ -73,10 +74,10 @@ class FirebaseCloudMessaging {
       fcmToken = await messaging.getToken();
     } catch (e) {
       if (e.toString().contains('apns-token-not-set')) {
-        debugPrint('⚠️ APNsトークン未取得のためFCMトークン生成失敗');
+        FunctionUtils.log('⚠️ APNsトークン未取得のためFCMトークン生成失敗');
         fcmToken = null;
       } else {
-        debugPrint('❌ FCMトークン取得中に予期せぬエラー: $e');
+        FunctionUtils.log('❌ FCMトークン取得中に予期せぬエラー: $e');
         return '';
       }
     }
@@ -90,12 +91,12 @@ class FirebaseCloudMessaging {
           domain: domain,
         );
         Authentication.myAccount?.member.fcmToken = fcmToken;
-        debugPrint('✅ updateToken: $fcmToken');
+        FunctionUtils.log('✅ updateToken: $fcmToken');
       } catch (e) {
-        debugPrint('⚠️ サーバー更新中にエラー: $e');
+        FunctionUtils.log('⚠️ サーバー更新中にエラー: $e');
       }
     } else {
-      debugPrint('⚠️ FCMトークンがnullまたは空のため登録スキップ');
+      FunctionUtils.log('⚠️ FCMトークンがnullまたは空のため登録スキップ');
     }
 
     // 二重登録防止付き onTokenRefresh
@@ -110,7 +111,7 @@ class FirebaseCloudMessaging {
           domain: domain,
         );
         Authentication.myAccount?.member.fcmToken = newFcmToken;
-        print('refreshToken:$newFcmToken');
+        FunctionUtils.log('refreshToken:$newFcmToken');
       });
     }
 
@@ -127,25 +128,25 @@ class FirebaseCloudMessaging {
       token: '',
     );
     await FirebaseMessaging.instance.deleteToken();
-    print('deleteToken');
+    FunctionUtils.log('deleteToken');
   }
 
   static void receiveNotification(RemoteMessage message, String type) {
     RemoteNotification? notification = message.notification;
     //AndroidNotification? android = message.notification?.android;
     if (!kIsWeb) {
-      // print('setNotification:$type');
-      // print('Message ID:${message.messageId}');
-      // print('Sender ID:${message.senderId}');
-      // print('Category:${message.category}');
-      // print('Collapse Key:${message.collapseKey}');
-      // print('Content Available:${message.contentAvailable.toString()}');
-      // print('Data:${message.data.toString()}');
-      // print('From:${message.from}');
-      // print('Message ID:${message.messageId}');
-      // print('Sent Time:${message.sentTime?.toString()}');
-      // print('Thread ID:${message.threadId}');
-      // print('Time to Live (TTL):${message.ttl?.toString()}');
+      // FunctionUtils.log('setNotification:$type');
+      // FunctionUtils.log('Message ID:${message.messageId}');
+      // FunctionUtils.log('Sender ID:${message.senderId}');
+      // FunctionUtils.log('Category:${message.category}');
+      // FunctionUtils.log('Collapse Key:${message.collapseKey}');
+      // FunctionUtils.log('Content Available:${message.contentAvailable.toString()}');
+      // FunctionUtils.log('Data:${message.data.toString()}');
+      // FunctionUtils.log('From:${message.from}');
+      // FunctionUtils.log('Message ID:${message.messageId}');
+      // FunctionUtils.log('Sent Time:${message.sentTime?.toString()}');
+      // FunctionUtils.log('Thread ID:${message.threadId}');
+      // FunctionUtils.log('Time to Live (TTL):${message.ttl?.toString()}');
 
       LocalNotifications.showNotify(message);
 

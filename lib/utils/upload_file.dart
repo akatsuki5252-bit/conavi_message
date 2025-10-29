@@ -1,3 +1,4 @@
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/legacy.dart';
 //*import 'package:just_audio/just_audio.dart';
@@ -18,7 +19,7 @@ class UploadFile{
   final isAudioPlayProvider = StateProvider((ref) => false);
   late final iconAudioPlayerProvider = StateProvider<Icon>((ref){
     bool isAudioPlay = ref.watch(isAudioPlayProvider);
-    print('iconAudioPlayerProvider:$isAudioPlay');
+    FunctionUtils.log('iconAudioPlayerProvider:$isAudioPlay');
     if(isAudioPlay){
       return const Icon(Icons.pause);
     }else{
@@ -47,7 +48,7 @@ class UploadFile{
 
   Future<void> setFile() async{
     // if(isAudioFlag) {
-    //   print('setAudio:true');
+    //   FunctionUtils.log('setAudio:true');
     //   try {
     //     audioPlayer = AudioPlayer();
     //     await audioPlayer!.setUrl(fileUrl);
@@ -56,23 +57,23 @@ class UploadFile{
     //     // message.file.audioPlayer!.playbackEventStream.listen((event) async{
     //     //   switch(event.processingState) {
     //     //     case ProcessingState.idle:
-    //     //       print('[id:${message.id}]:ProcessingState.idle');
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.idle');
     //     //       break;
     //     //     case ProcessingState.loading:
-    //     //       print('[id:${message.id}]:ProcessingState.loading');
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.loading');
     //     //       break;
     //     //     case ProcessingState.buffering:
-    //     //       print('[id:${message.id}]:ProcessingState.buffering');
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.buffering');
     //     //       break;
     //     //     case ProcessingState.ready:
-    //     //       print('[id:${message.id}]:ProcessingState.ready');
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.ready');
     //     //       break;
     //     //     case ProcessingState.completed:
-    //     //       print('[id:${message.id}]:ProcessingState.completed');
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.completed');
     //     //       break;
     //     //     default:
-    //     //       print('[id:${message.id}]:ProcessingState.default');
-    //     //       print(event.processingState);
+    //     //       FunctionUtils.log('[id:${message.id}]:ProcessingState.default');
+    //     //       FunctionUtils.log(event.processingState);
     //     //       break;
     //     //   }
     //     // });
@@ -82,29 +83,29 @@ class UploadFile{
     //     // Android: maps to ExoPlayerException.type
     //     // Web: maps to MediaError.code
     //     // Linux/Windows: maps to PlayerErrorCode.index
-    //     print("Error code: ${e.code}");
+    //     FunctionUtils.log("Error code: ${e.code}");
     //     // iOS/macOS: maps to NSError.localizedDescription
     //     // Android: maps to ExoPlaybackException.getMessage()
     //     // Web/Linux: a generic message
     //     // Windows: MediaPlayerError.message
-    //     print("Error message: ${e.message}");
+    //     FunctionUtils.log("Error message: ${e.message}");
     //   } on PlayerInterruptedException catch (e) {
     //     // This call was interrupted since another audio source was loaded or the
     //     // player was stopped or disposed before this audio source could complete
     //     // loading.
-    //     print("Connection aborted: ${e.message}");
+    //     FunctionUtils.log("Connection aborted: ${e.message}");
     //   } catch (e) {
     //     // Fallback for all other errors
-    //     print('An error occured: $e');
+    //     FunctionUtils.log('An error occured: $e');
     //   }
     // }else if(isPdfFlag){
-    //   // print(fileUrl);
+    //   // FunctionUtils.log(fileUrl);
     //   // final http.Response response = await http.get(Uri.parse(fileUrl));
-    //   // print(response.statusCode);
+    //   // FunctionUtils.log(response.statusCode);
     //   // if (response.statusCode == 200) {
-    //   //   print('a');
+    //   //   FunctionUtils.log('a');
     //   //   pdfController = PdfController(document: PdfDocument.openData(response.bodyBytes));
-    //   //   print(pdfController);
+    //   //   FunctionUtils.log(pdfController);
     //   // }
     // }else if(isVideoFlag){
     //   try {
@@ -114,7 +115,7 @@ class UploadFile{
     //     //   ..initialize()
     //     //       .then((value) => VideoPlayerController.network(fileUrl).play());
     //   }catch(e){
-    //     print('video error: $e');
+    //     FunctionUtils.log('video error: $e');
     //   }
     // }
   }

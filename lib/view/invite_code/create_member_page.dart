@@ -3,6 +3,7 @@ import 'package:conavi_message/api/api_members.dart';
 import 'package:conavi_message/setting/create_member.dart';
 import 'package:conavi_message/setting/result.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/util/authentication_code_page.dart';
@@ -185,8 +186,8 @@ class _CreateMemberPageState extends ConsumerState<CreateMemberPage> {
                                     if (resultDomain is Result && resultDomain.isSuccess && resultDomain.data.containsKey('domainUrl')) {
                                       String domainUrl = resultDomain.data['domainUrl'].toString();
                                       var resultCheckEmail = await ApiMembers.checkEmail(domain:domainUrl, email: _emailController.text,conaviId: widget.conaviId);
-                                      print(resultCheckEmail);
-                                      if(resultCheckEmail is Null || (resultCheckEmail is Result && resultCheckEmail.isSuccess == true)){
+                                      FunctionUtils.log(resultCheckEmail);
+                                      if(resultCheckEmail == null || (resultCheckEmail is Result && resultCheckEmail.isSuccess == true)){
                                         Loading.error(message: '入力したメールアドレスを使用できません');
                                         return;
                                       }

@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/utils/authentication.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/local_notifications.dart';
 import 'package:conavi_message/view/test/permissions.dart';
 import 'package:conavi_message/view/test/token_monitor.dart';
@@ -14,7 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 
 class NotificationPage extends StatefulWidget {
-  const NotificationPage({Key? key}) : super(key: key);
+  const NotificationPage({super.key});
 
   @override
   State<NotificationPage> createState() => _NotificationPageState();
@@ -27,12 +28,12 @@ class _NotificationPageState extends State<NotificationPage> {
   @override
   void initState() {
     super.initState();
-    print(myAccount.member.fcmToken);
+    FunctionUtils.log(myAccount.member.fcmToken);
   }
 
   Future<void> sendPushMessage() async {
     if (_token == null) {
-      print('Unable to send FCM message, no token exists.');
+      FunctionUtils.log('Unable to send FCM message, no token exists.');
       return;
     }
 
@@ -44,9 +45,9 @@ class _NotificationPageState extends State<NotificationPage> {
         },
         body: constructFCMPayload(_token),
       );
-      print('FCM request for device sent!');
+      FunctionUtils.log('FCM request for device sent!');
     } catch (e) {
-      print(e);
+      FunctionUtils.log(e);
     }
   }
 
@@ -59,9 +60,9 @@ class _NotificationPageState extends State<NotificationPage> {
         },
         body: createPayload(),
       );
-      print('FCM request for device sent!');
+      FunctionUtils.log('FCM request for device sent!');
     } catch (e) {
-      print(e);
+      FunctionUtils.log(e);
     }
   }
 
@@ -95,7 +96,7 @@ class _NotificationPageState extends State<NotificationPage> {
 
   @override
   Widget build(BuildContext context) {
-    print(myAccount.member.imagePath);
+    FunctionUtils.log(myAccount.member.imagePath);
     var rand = math.Random();
     return GestureDetector(
       onTap: () => primaryFocus?.unfocus(),
@@ -159,7 +160,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         var request = http.MultipartRequest("POST", uri);
                         request.fields['img_length'] = '2';
                         //request.headers['Authorization'] = '';
-                        print(request);
+                        FunctionUtils.log(request);
 
                         var picture = http.MultipartFile.fromBytes(
                           'img1',
@@ -181,11 +182,11 @@ class _NotificationPageState extends State<NotificationPage> {
                         request.files.add(picture2);
 
                         var response = await request.send();
-                        print(response.statusCode);
+                        FunctionUtils.log(response.statusCode);
                         if(response.statusCode == 200){
                           var responseData = await response.stream.toBytes();
                           var body = String.fromCharCodes(responseData);
-                          print(body);
+                          FunctionUtils.log(body);
                           Map<String, dynamic> data = jsonDecode(body);
                           if(!data.containsKey('error')) {
                             EasyLoading.dismiss();

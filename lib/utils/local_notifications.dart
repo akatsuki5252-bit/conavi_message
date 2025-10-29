@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:conavi_message/main.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/received_notification.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/services.dart';
@@ -108,12 +109,12 @@ class LocalNotifications {
         switch (notificationResponse.notificationResponseType) {
           //通常通知
           case NotificationResponseType.selectedNotification:
-            print('case:NotificationResponseType.selectedNotification');
+            FunctionUtils.log('case:NotificationResponseType.selectedNotification');
             selectNotificationStream.add(notificationResponse.payload);
             break;
           //アクション通知
           case NotificationResponseType.selectedNotificationAction:
-            print('case:NotificationResponseType.selectedNotificationAction');
+            FunctionUtils.log('case:NotificationResponseType.selectedNotificationAction');
             if (notificationResponse.actionId == navigationActionId) {
               selectNotificationStream.add(notificationResponse.payload);
             }
@@ -176,7 +177,7 @@ class LocalNotifications {
       final bodyBytes = await getImageBytes(imageUrl);
       return ByteArrayAndroidBitmap.fromBase64String(base64.encode(bodyBytes));
     } on Exception catch (e) {
-      print(e);
+      FunctionUtils.log(e);
       return null;
     }
   }
@@ -186,7 +187,7 @@ class LocalNotifications {
     if(notification != null) {
       //アイコン画像
       String imagePath = message.data.containsKey('image_url') ? message.data['image_url'] : '';
-      print('image:$imagePath');
+      FunctionUtils.log('image:$imagePath');
       final bitmapData = imagePath.isNotEmpty ? await getAndroidBitmap(imagePath) : null;
       //メッセージタイプ
       String type = message.data.containsKey('type') && message.data['type'] != null ? message.data['type'] : 'message';
@@ -233,7 +234,7 @@ class LocalNotifications {
 
       //ルーム作成時間を通知識別IDとして使用
       int pushId = message.data.containsKey('unique_key') && message.data['unique_key'] != null ? int.parse(message.data['unique_key']) : notification.hashCode;
-      print('pushId:$pushId');
+      FunctionUtils.log('pushId:$pushId');
 
       //ローカル通知
       await flutterLocalNotificationsPlugin.show(
@@ -292,7 +293,7 @@ class LocalNotifications {
     final String filePath = '${directory.path}/$fileName';
     if (url != null) {
       final http.Response response = await http.get(Uri.parse(url));
-      print(response.statusCode);
+      FunctionUtils.log(response.statusCode);
       if (response.statusCode != 404) {
         final File file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
@@ -308,13 +309,37 @@ class LocalNotifications {
     await flutterLocalNotificationsPlugin.cancelAll();
   }
 
-  static Future<void> isAndroidPermissionGranted() async {
-    if (Platform.isAndroid) {
-      final bool granted = await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.areNotificationsEnabled() ?? false;
-      if (!granted) {
-        print('LocalNotifications:isAndroidPermissionGranted');
+  static Future<bool> isNotificationPermissionGranted() async {
+    // iOS系
+    if (Platform.isIOS) {
+      final settings = await FirebaseMessaging.instance.getNotificationSettings();
+
+      FunctionUtils.log('🔔 iOS Status: ${settings.authorizationStatus}');
+
+      switch (settings.authorizationStatus) {
+        case AuthorizationStatus.authorized:
+        //case AuthorizationStatus.ephemeral:
+        case AuthorizationStatus.provisional:
+          return true;
+        case AuthorizationStatus.denied:
+        case AuthorizationStatus.notDetermined:
+          return false;
       }
     }
+
+    // Android系
+    if (Platform.isAndroid) {
+      final androidPlugin =
+      flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>();
+
+      final granted = await androidPlugin?.areNotificationsEnabled() ?? false;
+
+      FunctionUtils.log('🔔 Android Notification Permission: $granted');
+      return granted;
+    }
+
+    return false;
   }
 
   static Future<void> requestPermissions() async {
@@ -335,16 +360,16 @@ class LocalNotifications {
 
       final bool? granted = await androidImplementation?.requestNotificationsPermission();
       if (granted == null || !granted) {
-        print('requestNotificationsPermission:not requestPermission');
+        FunctionUtils.log('requestNotificationsPermission:not requestPermission');
       }else{
-        print('requestNotificationsPermission:clear');
+        FunctionUtils.log('requestNotificationsPermission:clear');
       }
 
       final bool? granted2 = await androidImplementation?.requestExactAlarmsPermission();
       if (granted2 == null || !granted2) {
-        print('requestExactAlarmsPermission:not requestPermission');
+        FunctionUtils.log('requestExactAlarmsPermission:not requestPermission');
       }else{
-        print('requestExactAlarmsPermission:clear');
+        FunctionUtils.log('requestExactAlarmsPermission:clear');
       }
     }
   }

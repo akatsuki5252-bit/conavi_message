@@ -120,7 +120,7 @@ class _SelectMessageMemberPageState extends ConsumerState<SelectMessageMemberPag
                 ];
                 memberIds.sort((a, b) => a.compareTo(b));
                 String listAsString = FunctionUtils.listToString(memberIds);
-                //print(listAsString);
+                //FunctionUtils.log(listAsString);
                 //ルーム情報を作成・取得
                 final talkRoom = await ApiMessages.createRoom(
                   joinedMemberIds: listAsString,

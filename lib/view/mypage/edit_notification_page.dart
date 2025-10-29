@@ -3,6 +3,7 @@ import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/api/api_members.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/shared_prefs.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
@@ -23,8 +24,8 @@ class _EditNotificationPageState extends ConsumerState<EditNotificationPage> {
   void initState() {
     super.initState();
     Auth myAccount = ref.read(authProvider);
-    print(myAccount.userSetting.localNotificationFlag);
-    print(SharedPrefs.fetch(name: 'localNotificationFlag'));
+    FunctionUtils.log(myAccount.userSetting.localNotificationFlag);
+    FunctionUtils.log(SharedPrefs.fetch(name: 'localNotificationFlag'));
     _active = myAccount.userSetting.localNotificationFlag == true ? true : false;
   }
 

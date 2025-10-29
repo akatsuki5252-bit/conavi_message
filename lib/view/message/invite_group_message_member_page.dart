@@ -97,7 +97,7 @@ class _InviteGroupMessageMemberPageState extends ConsumerState<InviteGroupMessag
                       imageUrl: widget.talkRoom.imagePath
                     );
                     if(!result){
-                      print('プッシュ通知でエラーが発生');
+                      FunctionUtils.log('プッシュ通知でエラーが発生');
                     }
                     if (!context.mounted) return;
                     Navigator.pop(context,true);
@@ -168,7 +168,7 @@ class _InviteGroupMessageMemberPageState extends ConsumerState<InviteGroupMessag
                                   setState(() {
                                     member.isChecked = value;
                                   });
-                                  print(_inviteMembers);
+                                  FunctionUtils.log(_inviteMembers);
                                 },
                               ),
                             ) :
@@ -241,7 +241,7 @@ class _InviteGroupMessageMemberPageState extends ConsumerState<InviteGroupMessag
   //               ];
   //               memberIds.sort((a, b) => a.compareTo(b));
   //               String listAsString = FunctionUtils.listToString(memberIds);
-  //               //print(listAsString);
+  //               //FunctionUtils.log(listAsString);
   //               //ルーム情報を作成・取得
   //               final talkRoom = await ApiMessages.createRoom(
   //                 joinedMemberIds: listAsString,

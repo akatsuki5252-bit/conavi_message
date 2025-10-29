@@ -2,6 +2,7 @@ import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:conavi_message/model/group_message.dart';
 import 'package:conavi_message/setting/auth.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/view/util/image_view_page.dart';
 import 'package:conavi_message/view/util/pdf_view_page.dart';
 import 'package:flutter/gestures.dart';
@@ -85,7 +86,7 @@ class WidgetUtils {
           imagePath,
           fit: BoxFit.cover,
           errorBuilder: (c, o, s) {
-            print('error-image:$imagePath');
+            FunctionUtils.log('error-image:$imagePath');
             return const Icon(Icons.person, size: 35, color: Colors.white);
           },
         ),
@@ -257,7 +258,7 @@ class WidgetUtils {
         ),
       );
     }else if(message.type == '2') { //システムメッセージ
-      //print(message.sendTime.minute);
+      //FunctionUtils.log(message.sendTime.minute);
       String sendTime = intl.DateFormat('HH:mm').format(message.sendTime);
       return Center(
         child: Bubble(
@@ -345,10 +346,10 @@ class WidgetUtils {
     required String fileExtension,
     required bool isMe,
     required bool isLast}) {
-    // print(fileUrl);
-    // print(fileName);
-    // print(fileExtension.toLowerCase());
-    // print(isLast);
+    // FunctionUtils.log(fileUrl);
+    // FunctionUtils.log(fileName);
+    // FunctionUtils.log(fileExtension.toLowerCase());
+    // FunctionUtils.log(isLast);
     if (fileExtension.toLowerCase() == '.png' ||
         fileExtension.toLowerCase() == '.jpg' ||
         fileExtension.toLowerCase() == '.jpeg' ||
@@ -463,10 +464,10 @@ class WidgetUtils {
                           if (await canLaunchUrl(uri)) {
                              await launchUrl(uri,mode: LaunchMode.externalApplication);
                            } else {
-                             print('Could not launch $uri');
+                             FunctionUtils.log('Could not launch $uri');
                            }
                         } catch (e) {
-                          print('error url_launch:$e');
+                          FunctionUtils.log('error url_launch:$e');
                         }
                       },
                   )

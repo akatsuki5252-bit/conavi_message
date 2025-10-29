@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:conavi_message/setting/result.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:http/http.dart' as http;
 
 class ApiDomains {
@@ -18,12 +19,12 @@ class ApiDomains {
         'conavi_id': conaviId,
       });
 
-      print('conavi_id:$conaviId');
+      FunctionUtils.log('conavi_id:$conaviId');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
           if(data.containsKey('domain_url')){
@@ -32,18 +33,18 @@ class ApiDomains {
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createCommunity error ===== ${data['error']}');
+          FunctionUtils.log('createCommunity error ===== ${data['error']}');
         }
-        print(result.isSuccess);
-        print(result.data);
+        FunctionUtils.log(result.isSuccess);
+        FunctionUtils.log(result.data);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createCommunity statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createCommunity statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createCommunity try catch error ===== $e');
+      FunctionUtils.log('createCommunity try catch error ===== $e');
     }
     return null;
   }
@@ -62,12 +63,12 @@ class ApiDomains {
         'conavi_id': conaviId,
       });
 
-      print('conavi_id:$conaviId');
+      FunctionUtils.log('conavi_id:$conaviId');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
           if(data.containsKey('invite_code')){
@@ -76,16 +77,16 @@ class ApiDomains {
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createInviteCode error ===== ${data['error']}');
+          FunctionUtils.log('createInviteCode error ===== ${data['error']}');
         }
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createInviteCode statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createInviteCode statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createInviteCode try catch error ===== $e');
+      FunctionUtils.log('createInviteCode try catch error ===== $e');
     }
     return null;
   }
@@ -106,13 +107,13 @@ class ApiDomains {
         'checked': checked,
       });
 
-      print('invite_code:$inviteCode');
-      print('checked:$checked');
+      FunctionUtils.log('invite_code:$inviteCode');
+      FunctionUtils.log('checked:$checked');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
           if(data.containsKey('conavi_id')){
@@ -121,16 +122,16 @@ class ApiDomains {
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('checkInviteCode error ===== ${data['error']}');
+          FunctionUtils.log('checkInviteCode error ===== ${data['error']}');
         }
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('checkInviteCode statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('checkInviteCode statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('checkInviteCode try catch error ===== $e');
+      FunctionUtils.log('checkInviteCode try catch error ===== $e');
     }
     return null;
   }
@@ -151,28 +152,28 @@ class ApiDomains {
         'invite_code': inviteCode,
       });
 
-      print('email:$email');
-      print('invite_code:$inviteCode');
+      FunctionUtils.log('email:$email');
+      FunctionUtils.log('invite_code:$inviteCode');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('sendInviteCode error ===== ${data['error']}');
+          FunctionUtils.log('sendInviteCode error ===== ${data['error']}');
         }
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('sendInviteCode statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('sendInviteCode statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('sendInviteCode try catch error ===== $e');
+      FunctionUtils.log('sendInviteCode try catch error ===== $e');
     }
     return null;
   }
@@ -191,26 +192,26 @@ class ApiDomains {
         'version': version,
       });
 
-      print('version:$version');
+      FunctionUtils.log('version:$version');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
-          print('checkAppVersion error ===== ${data['error']}');
+          FunctionUtils.log('checkAppVersion error ===== ${data['error']}');
         }
         return result.isSuccess;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('checkAppVersion statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('checkAppVersion statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('checkAppVersion try catch error ===== $e');
+      FunctionUtils.log('checkAppVersion try catch error ===== $e');
     }
     return false;
   }

@@ -9,13 +9,15 @@ import 'package:conavi_message/setting/create_member.dart';
 import 'package:conavi_message/setting/result.dart';
 import 'package:conavi_message/utils/authentication.dart';
 import 'package:conavi_message/utils/custom_alert_dialog.dart';
+import 'package:conavi_message/utils/firebase_cloud_messaging.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
+import 'package:conavi_message/utils/local_notifications.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/invite_code/create_member_page.dart';
 import 'package:conavi_message/view/screen.dart';
 import 'package:conavi_message/view/community/create_community_page.dart';
 import 'package:conavi_message/view/startup/password_reset_page.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,7 +44,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   bool _isObscure = true; //パスワード非表示
   String _version = ''; //バージョン
 
-  Future getVer() async {
+  Future showAppVersion() async {
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
     setState(() {
       _version = 'Ver.${packageInfo.version}';
@@ -52,7 +54,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   @override
   void initState() {
     super.initState();
-    getVer();
+    showAppVersion();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // 通知権限があるかチェック
+      final granted = await LocalNotifications.isNotificationPermissionGranted();
+      if (!granted) {
+        // 通知権限リクエスト
+        await LocalNotifications.requestPermissions().catchError((e) {
+          FunctionUtils.log('LocalNotifications permission error: $e');
+        });
+        // FCMの通知権限リクエスト
+        await FirebaseCloudMessaging.requestPermissions().catchError((e) {
+          FunctionUtils.log('FirebaseCloudMessaging permission error: $e');
+        });
+      }
+    });
   }
 
   @override
@@ -217,7 +234,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                               MaterialPageRoute(builder: (context) => const PasswordResetPage()),
                                             );
                                           } catch (e) {
-                                            print('error url_launch:$e');
+                                            FunctionUtils.log('error url_launch:$e');
                                           }
                                         },
                                     ),
@@ -347,11 +364,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                   ),),
                                                 );
                                                 if(resultMember is CreateMember) {
-                                                  print(resultMember.conaviId);
-                                                  print(resultMember.userName);
-                                                  print(resultMember.email);
-                                                  print(resultMember.password);
-                                                  print(resultMember.inviteCode);
+                                                  FunctionUtils.log(resultMember.conaviId);
+                                                  FunctionUtils.log(resultMember.userName);
+                                                  FunctionUtils.log(resultMember.email);
+                                                  FunctionUtils.log(resultMember.password);
+                                                  FunctionUtils.log(resultMember.inviteCode);
                                                   //ローディングを表示
                                                   Loading.show(message: '新規メンバーを作成中...', isDismissOnTap: false);
                                                   //ドメイン情報を取得
@@ -370,13 +387,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                                     if (result is Result && result.isSuccess) {
                                                       //招待コードを使用済みに更新
                                                       var resultCheckInviteCode = await ApiDomains.checkInviteCode(inviteCode: resultMember.inviteCode,checked: '1');
-                                                      print(resultCheckInviteCode);
+                                                      FunctionUtils.log(resultCheckInviteCode);
                                                       if(resultCheckInviteCode is Result && resultCheckInviteCode.isSuccess){
                                                         _conaviIdController.text = resultMember.conaviId;
                                                         _emailController.text = resultMember.email;
                                                         Loading.dismiss();
                                                       }else{
-                                                        print('招待コード更新に失敗');
+                                                        FunctionUtils.log('招待コード更新に失敗');
                                                       }
                                                     } else {
                                                       Loading.error(message: '新規メンバーの作成に失敗しました');
@@ -446,20 +463,20 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                           builder: (context) => const CreateCommunityPage(),
                                         ),
                                       );
-                                      print(resultCommunityMember);
+                                      FunctionUtils.log(resultCommunityMember);
                                       if(resultCommunityMember is CreateMember){
-                                        print(resultCommunityMember.communityName);
-                                        print(resultCommunityMember.userName);
-                                        print(resultCommunityMember.email);
-                                        print(resultCommunityMember.password);
+                                        FunctionUtils.log(resultCommunityMember.communityName);
+                                        FunctionUtils.log(resultCommunityMember.userName);
+                                        FunctionUtils.log(resultCommunityMember.email);
+                                        FunctionUtils.log(resultCommunityMember.password);
                                         //ローディングを表示
                                         Loading.show(message: 'コミュニティを作成中...', isDismissOnTap: false);
                                         //コミュニティの作成
                                         var resultCommunity = await ApiCommunitys.createCommunity(communityName: resultCommunityMember.communityName, email: resultCommunityMember.email);
-                                        print(resultCommunity);
+                                        FunctionUtils.log(resultCommunity);
                                         if(resultCommunity is Result && resultCommunity.isSuccess){
                                           if(resultCommunity.data.containsKey('conaviId')){
-                                            print(resultCommunity.data);
+                                            FunctionUtils.log(resultCommunity.data);
                                             var result = await ApiCommunitys.createMember(
                                               name: resultCommunityMember.userName,
                                               email: resultCommunityMember.email,

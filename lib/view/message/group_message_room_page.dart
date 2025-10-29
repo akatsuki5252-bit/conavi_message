@@ -107,7 +107,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                 );
                 //ローディングメッセージを破棄
                 Loading.dismiss();
-                print(result);
+                FunctionUtils.log(result);
                 if(result != null){
                   if(result){
                     ref.refresh(talkGroupMessagesFutureProvider(widget.talkRoom));
@@ -146,7 +146,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                 );
                 //ローディングメッセージを破棄
                 Loading.dismiss();
-                print(result);
+                FunctionUtils.log(result);
                 if(result != null){
                   if(result){
                     if (!context.mounted) return;
@@ -184,7 +184,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
       ref.read(selectedGroupMessageRoomProvider.notifier).state = widget.talkRoom;
       final talkRoom = ref.read(selectedGroupMessageRoomProvider);
       if(talkRoom is TalkGroupRoom) {
-        print('currentTalkRoomId:${talkRoom.roomId}');
+        FunctionUtils.log('currentTalkRoomId:${talkRoom.roomId}');
       }
     });
     final myAccount = ref.read(authProvider);
@@ -250,7 +250,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                               builder: (context) => SettingGroupPage(widget.talkRoom),
                             ),
                           );
-                          print(result);
+                          FunctionUtils.log(result);
                           if(result is bool){
                             if(result) {
                               final newTalkGroupRoom = await ApiGroupMessages.fetchGroupRoom(myAccount: myAccount, roomId: widget.talkRoom.roomId);
@@ -403,7 +403,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                             final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
                                             if (pickedFile == null) return;
                                             List<File> files = [File(pickedFile.path)];
-                                            print(files);
+                                            FunctionUtils.log(files);
                                             //ローディングメッセージを表示
                                             Loading.show(message: 'アップロード中...', isDismissOnTap: false,);
                                             //アップロード処理
@@ -428,7 +428,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                                 imageUrl: widget.talkRoom.imagePath
                                               );
                                               if(!result){
-                                                print('プッシュ通知でエラーが発生');
+                                                FunctionUtils.log('プッシュ通知でエラーが発生');
                                               }
                                               Loading.dismiss();
                                             } else {
@@ -451,7 +451,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                                   return WidgetDialogs.showFileTypeDialog(context);
                                                 });
                                             if(selectedFileType == null) return;
-                                            print(selectedFileType);
+                                            FunctionUtils.log(selectedFileType);
                                             if (!context.mounted) return;
                                             var resultPickerFile = await Navigator.push(context,
                                               MaterialPageRoute(builder: (context) => FilePickerPage(
@@ -461,7 +461,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                                 limitFileSize: 100.0,),
                                               ),
                                             );
-                                            print("result: $resultPickerFile");
+                                            FunctionUtils.log("result: $resultPickerFile");
                                             if (resultPickerFile is List<PickerFile>) {
                                               List<File> files = [];
                                               for(var pickerFile in resultPickerFile){
@@ -491,7 +491,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                                   imageUrl: widget.talkRoom.imagePath
                                                 );
                                                 if(!result){
-                                                  print('プッシュ通知でエラーが発生');
+                                                  FunctionUtils.log('プッシュ通知でエラーが発生');
                                                 }
                                                 Loading.dismiss();
                                               } else {
@@ -557,7 +557,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                             sendMemberFromId: myAccount.member.id,
                                             message: sendText,
                                             domain: myAccount.domain.url);
-                                        print(result);
+                                        FunctionUtils.log(result);
                                         if (result) {
                                           //画面リロード
                                           // 状態を更新する
@@ -574,7 +574,7 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                             imageUrl: widget.talkRoom.imagePath,
                                           );
                                           if(!result){
-                                            print('プッシュ通知でエラーが発生');
+                                            FunctionUtils.log('プッシュ通知でエラーが発生');
                                           }
                                         }else{
                                           Loading.error(message: 'メッセージの送信に失敗しました');

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/setting/result.dart';
+import 'package:conavi_message/utils/function_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
 
@@ -29,11 +30,11 @@ class ApiMembers {
         selfIntroduction: data['member']['self_introduction'],
         imagePath: data['member']['image_path'],
       );
-      //print(data);
-      print('新規ユーザー作成完了');
+      //FunctionUtils.log(data);
+      FunctionUtils.log('新規ユーザー作成完了');
       return member;
     } catch (e) {
-      print('新規ユーザー作成エラー ===== $e');
+      FunctionUtils.log('新規ユーザー作成エラー ===== $e');
       return null;
     }
   }
@@ -52,7 +53,7 @@ class ApiMembers {
       });
 
       if (response.statusCode == 200) {
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('member') && !data.containsKey('error')) {
           Member member = Member(
@@ -64,16 +65,16 @@ class ApiMembers {
               fcmToken: data['member']['fcm_token'],
               appToken: data['member']['app_token']
           );
-          print('ユーザー情報の更新完了');
+          FunctionUtils.log('ユーザー情報の更新完了');
           return member;
         } else {
-          print('updateMember error ===== ${data['error']}');
+          FunctionUtils.log('updateMember error ===== ${data['error']}');
         }
       } else {
-        print('updateMember statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateMember statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateMember try catch error ===== $e');
+      FunctionUtils.log('updateMember try catch error ===== $e');
     }
     return null;
   }
@@ -100,25 +101,25 @@ class ApiMembers {
         );
         request.files.add(picture);
         var response = await request.send();
-        //print(response.statusCode);
+        //FunctionUtils.log(response.statusCode);
         if(response.statusCode == 200){
           var responseData = await response.stream.toBytes();
           var body = String.fromCharCodes(responseData);
-          //print(body);
+          //FunctionUtils.log(body);
           Map<String, dynamic> data = jsonDecode(body);
           if(!data.containsKey('error')) {
             return true;
           }else{
-            print('uploadMemberFile error ===== ${data['error']}');
+            FunctionUtils.log('uploadMemberFile error ===== ${data['error']}');
           }
         }else{
-          print('uploadMemberFile statusCode error ===== ${response.statusCode}');
+          FunctionUtils.log('uploadMemberFile statusCode error ===== ${response.statusCode}');
         }
       }else{
-        print('uploadMemberFile error ===== no List<File>');
+        FunctionUtils.log('uploadMemberFile error ===== no List<File>');
       }
     } catch (e) {
-      print('uploadMemberFile try catch error ===== $e');
+      FunctionUtils.log('uploadMemberFile try catch error ===== $e');
     }
     return false;
   }
@@ -136,11 +137,11 @@ class ApiMembers {
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if (data.containsKey('member') && !data.containsKey('error')) {
           for (var member in data['member']) {
             //if (mid == member['id']) continue;
-            //print(json.encode(member));
+            //FunctionUtils.log(json.encode(member));
             list.add(
               Member(
                 id: member['id'],
@@ -151,15 +152,15 @@ class ApiMembers {
             );
           }
           //member['member_image_base'].replaceFirst('./uploads', '$domain/uploads')
-          //print('ユーザー取得完了');
+          //FunctionUtils.log('ユーザー取得完了');
         } else {
-          print('fetchMembers error ===== ${data['error']}');
+          FunctionUtils.log('fetchMembers error ===== ${data['error']}');
         }
       } else {
-        print('fetchMembers statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchMembers statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchMembers try catch error ===== $e');
+      FunctionUtils.log('fetchMembers try catch error ===== $e');
     }
     return list;
   }
@@ -174,7 +175,7 @@ class ApiMembers {
         'id': memberId,
       });
       if (response.statusCode == 200) {
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('member') && !data.containsKey('error')){
           Member member = Member(
@@ -186,16 +187,16 @@ class ApiMembers {
             fcmToken: data['member']['fcm_token'],
             appToken: data['member']['app_token'],
           );
-          //print(member.toJson());
+          //FunctionUtils.log(member.toJson());
           return member;
         } else {
-          print('fetchProfile error ===== ${data['error']}');
+          FunctionUtils.log('fetchProfile error ===== ${data['error']}');
         }
       } else {
-        print('fetchProfile statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('fetchProfile statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('fetchProfile try catch error ===== $e');
+      FunctionUtils.log('fetchProfile try catch error ===== $e');
     }
     return null;
   }
@@ -214,23 +215,23 @@ class ApiMembers {
         'self_introduction': selfIntroduction,
       });
       if (response.statusCode == 200) {
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (data.containsKey('result')) {
           if(data['result'] == true) {
-            print('メンバー情報更新：成功');
+            FunctionUtils.log('メンバー情報更新：成功');
             return true;
           }else{
-            print('メンバー情報更新：失敗');
+            FunctionUtils.log('メンバー情報更新：失敗');
           }
         } else {
-          print('updateProfile error ===== ${data['error']}');
+          FunctionUtils.log('updateProfile error ===== ${data['error']}');
         }
       } else {
-        print('updateProfile statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateProfile statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateProfile try catch error ===== $e');
+      FunctionUtils.log('updateProfile try catch error ===== $e');
     }
     return false;
   }
@@ -240,7 +241,7 @@ class ApiMembers {
   //     var url = Uri.parse('https://.conavi.net/index.php');
   //     var result = await http.get(url);
   //     Map<String, dynamic> data = jsonDecode(result.body);
-  //     //print(data);
+  //     //FunctionUtils.log(data);
   //     //Member member = Member(id: id, name: name, userId: userId, selfIntroduction: selfIntroduction, imagePath: imagePath)
   //     //await http.get(url);
   //     /*DocumentSnapshot documentSnapshot = await users.doc(uid).get();
@@ -255,10 +256,10 @@ class ApiMembers {
   //         createTime: data['created_time'],
   //         updateTime: data['updated_time']);
   //     Authentication.myAccount = myAccount;*/
-  //     print('ユーザー取得完了');
+  //     FunctionUtils.log('ユーザー取得完了');
   //     return true;
   //   } catch (e) {
-  //     print('ユーザー取得エラー ===== $e');
+  //     FunctionUtils.log('ユーザー取得エラー ===== $e');
   //     return false;
   //   }
   // }
@@ -275,18 +276,18 @@ class ApiMembers {
         'token': token,
       });
       if (response.statusCode == 200) {
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (!data.containsKey('error')) {
-          print('FCMトークン情報の更新完了');
+          FunctionUtils.log('FCMトークン情報の更新完了');
         } else {
-          print('updateFcmToken error ===== ${data['error']}');
+          FunctionUtils.log('updateFcmToken error ===== ${data['error']}');
         }
       }else{
-        print('updateFcmToken statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateFcmToken statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateFcmToken try catch error ===== $e');
+      FunctionUtils.log('updateFcmToken try catch error ===== $e');
     }
   }
 
@@ -304,18 +305,18 @@ class ApiMembers {
         'app_version' : appVersion,
       });
       if (response.statusCode == 200) {
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         Map<String, dynamic> data = jsonDecode(response.body);
         if (!data.containsKey('error')) {
-          print('デバイス情報の更新完了');
+          FunctionUtils.log('デバイス情報の更新完了');
         } else {
-          print('updateDeviceInfo error ===== ${data['error']}');
+          FunctionUtils.log('updateDeviceInfo error ===== ${data['error']}');
         }
       }else{
-        print('updateDeviceInfo statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('updateDeviceInfo statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
-      print('updateDeviceInfo try catch error ===== $e');
+      FunctionUtils.log('updateDeviceInfo try catch error ===== $e');
     }
   }
 
@@ -338,32 +339,32 @@ class ApiMembers {
         'conavi_id': conaviId,
       });
 
-      print('----------ApiMember.createMember-----------');
-      print('name:$name');
-      print('email:$email');
-      print('password:$password');
-      print('conavi_id:$conaviId');
+      FunctionUtils.log('----------ApiMember.createMember-----------');
+      FunctionUtils.log('name:$name');
+      FunctionUtils.log('email:$email');
+      FunctionUtils.log('password:$password');
+      FunctionUtils.log('conavi_id:$conaviId');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('createMember error ===== ${data['error']}');
+          FunctionUtils.log('createMember error ===== ${data['error']}');
         }
-        //print(result.isSuccess);
+        //FunctionUtils.log(result.isSuccess);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('createMember statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('createMember statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('createMember try catch error ===== $e');
+      FunctionUtils.log('createMember try catch error ===== $e');
     }
     return null;
   }
@@ -384,14 +385,14 @@ class ApiMembers {
         'conavi_id': conaviId,
       });
 
-      print('domain:$domain');
-      print('email:$email');
-      print('conavi_id:$conaviId');
+      FunctionUtils.log('domain:$domain');
+      FunctionUtils.log('email:$email');
+      FunctionUtils.log('conavi_id:$conaviId');
 
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        //print(response.body);
+        //FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
           if(data.containsKey('member')){
@@ -400,18 +401,18 @@ class ApiMembers {
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('checkEmail error ===== ${data['error']}');
+          FunctionUtils.log('checkEmail error ===== ${data['error']}');
         }
-        print(result.isSuccess);
-        print(result.data);
+        FunctionUtils.log(result.isSuccess);
+        FunctionUtils.log(result.data);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('checkEmail statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('checkEmail statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('checkEmail try catch error ===== $e');
+      FunctionUtils.log('checkEmail try catch error ===== $e');
     }
     return null;
   }
@@ -431,28 +432,28 @@ class ApiMembers {
         'member_id': memberId,
         'password': password,
       });
-      print('member_id:$memberId');
-      print('password:$password');
+      FunctionUtils.log('member_id:$memberId');
+      FunctionUtils.log('password:$password');
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('checkPassword error ===== ${data['error']}');
+          FunctionUtils.log('checkPassword error ===== ${data['error']}');
         }
-        print(result.isSuccess);
+        FunctionUtils.log(result.isSuccess);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('checkPassword statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('checkPassword statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('checkPassword try catch error ===== $e');
+      FunctionUtils.log('checkPassword try catch error ===== $e');
     }
     return null;
   }
@@ -472,28 +473,28 @@ class ApiMembers {
         'member_id': memberId,
         'password': password,
       });
-      print('member_id:$memberId');
-      print('password:$password');
+      FunctionUtils.log('member_id:$memberId');
+      FunctionUtils.log('password:$password');
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('changePassword error ===== ${data['error']}');
+          FunctionUtils.log('changePassword error ===== ${data['error']}');
         }
-        print(result.isSuccess);
+        FunctionUtils.log(result.isSuccess);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('changePassword statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('changePassword statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('changePassword try catch error ===== $e');
+      FunctionUtils.log('changePassword try catch error ===== $e');
     }
     return null;
   }
@@ -511,29 +512,29 @@ class ApiMembers {
       var response = await http.post(url, body: {
         'member_id': memberId,
       });
-      print('domain:$domain');
-      print('member_id:$memberId');
+      FunctionUtils.log('domain:$domain');
+      FunctionUtils.log('member_id:$memberId');
       //取得
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);
-        print(response.body);
+        FunctionUtils.log(response.body);
         if(data.containsKey('result')){
           result.isSuccess = data['result'];
         }
         if(data.containsKey('error')){
           result.error = data['error'];
-          print('delete error ===== ${data['error']}');
+          FunctionUtils.log('delete error ===== ${data['error']}');
         }
-        print(result.isSuccess);
-        print(result.data);
+        FunctionUtils.log(result.isSuccess);
+        FunctionUtils.log(result.data);
         return result;
       } else {
         //リクエスト失敗（※送信は成功）
-        print('delete statusCode error ===== ${response.statusCode}');
+        FunctionUtils.log('delete statusCode error ===== ${response.statusCode}');
       }
     } catch (e) {
       //リクエスト送信失敗
-      print('delete try catch error ===== $e');
+      FunctionUtils.log('delete try catch error ===== $e');
     }
     return null;
   }
