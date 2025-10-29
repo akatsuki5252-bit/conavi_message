@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:conavi_message/model/group_message.dart';
 import 'package:conavi_message/model/member.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -256,6 +257,24 @@ class FunctionUtils {
       }
     } else {
       debugPrint(text);
+    }
+  }
+
+  static Future<void> setAppBadgeCount(int count) async {
+    final badgeCount = count < 0 ? 0 : count;
+
+    bool isSupported = await AppBadgePlus.isSupported();
+    FunctionUtils.log('Badge Supported: $isSupported // set: $badgeCount');
+
+    if(isSupported) {
+      await AppBadgePlus.updateBadge(badgeCount);
+    }
+  }
+
+  static Future<void> clearAppBadgeCount() async {
+    bool isSupported = await AppBadgePlus.isSupported();
+    if(isSupported) {
+      await AppBadgePlus.updateBadge(0);
     }
   }
 }

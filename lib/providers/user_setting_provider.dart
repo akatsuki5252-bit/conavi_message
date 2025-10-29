@@ -1,5 +1,6 @@
 import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/setting/user_setting.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/legacy.dart';
 
 //下部メニュー番号
@@ -17,7 +18,11 @@ final bottomNavigationMessageBadgeProvider = StateProvider((ref){
   return countMessageUnRead + countGroupMessageUnRead;
 });
 //アプリ通知バッチ
-final appBadgeProvider = StateProvider((ref) => 0);
+final countAppBadgeProvider = StateProvider((ref){
+  int countMessageUnRead = ref.watch(countMessageUnReadProvider);
+  int countGroupMessageUnRead = ref.watch(countGroupMessageUnReadProvider);
+  return countMessageUnRead + countGroupMessageUnRead;
+});
 //ファイル閲覧フラグ
 final isFilePreviewFlagProvider = StateProvider((ref) => UserSetting().currentFilePreviewFlag);
 //通知設定

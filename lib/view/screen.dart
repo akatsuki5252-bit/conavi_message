@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:conavi_message/api/api_group_message.dart';
 import 'package:conavi_message/const/enum.dart';
@@ -23,7 +24,6 @@ import 'package:conavi_message/view/message/message_room_page.dart';
 import 'package:conavi_message/view/message/message_screen.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_app_badge_control/flutter_app_badge_control.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:url_launcher/url_launcher_string.dart';
 class Screen extends ConsumerStatefulWidget {
@@ -348,6 +348,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     Auth myAccount = ref.watch(authProvider);
     int countBottomNavigationMessageBadge = ref.watch(bottomNavigationMessageBadgeProvider);
+    int countAppBadge = ref.watch(countAppBadgeProvider);
     return Scaffold(
       body: SafeArea(child: _footerPageList[myAccount.userSetting.currentBottomNavigationIndex]),
       bottomNavigationBar: Container(
@@ -414,11 +415,7 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async{
-          bool isSupported =
-              await FlutterAppBadgeControl.isAppBadgeSupported();
-          // ignore: avoid_print
-          FunctionUtils.log('isSupported: $isSupported');
-          await FlutterAppBadgeControl.updateBadgeCount(1);
+          FunctionUtils.setAppBadgeCount(countAppBadge);
         },
         child: const Icon(Icons.add),
       ),

@@ -44,7 +44,7 @@ dependencies:
 
   # --- UI Components ---
   flutter_screenutil: ^5.9.3            # 画面サイズに応じたレイアウト調整（レスポンシブ対応）を行うためのライブラリ
-  flutter_app_badge_control: ^0.0.2
+  app_badge_plus: ^1.2.3
   # 古い
   flutter_easyloading: ^3.0.5           # ローディングインジケーターやトースト風の表示を簡単に実装できるライブラリ
   flutter_native_splash: ^2.4.6         # アプリ起動時（ネイティブ起動フェーズ）に表示されるスプラッシュ画面を自動生成するツール
