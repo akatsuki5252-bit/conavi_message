@@ -227,6 +227,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         ),
       );
     }else{
+
       if (!mounted) return;
       //ログインなし
       Navigator.pushReplacement(
