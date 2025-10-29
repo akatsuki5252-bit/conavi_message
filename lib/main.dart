@@ -210,10 +210,7 @@ class _MyAppState extends ConsumerState<MyApp> {
           textSize: 16.0,
           cancelFlg: true
       );
-    }
-
-    if(myAccount is Auth){
-      //ログインあり
+      //ログイン情報をセット
       ref.read(userProvider.notifier).state  = myAccount!.member;
       ref.read(domainProvider.notifier).state  = myAccount!.domain;
       ref.read(userSettingProvider.notifier).state = myAccount!.userSetting;

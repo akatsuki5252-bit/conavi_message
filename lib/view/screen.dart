@@ -348,7 +348,12 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
   Widget build(BuildContext context) {
     Auth myAccount = ref.watch(authProvider);
     int countBottomNavigationMessageBadge = ref.watch(bottomNavigationMessageBadgeProvider);
-    int countAppBadge = ref.watch(countAppBadgeProvider);
+    //アプリバッチ
+    ref.listen(countAppBadgeProvider, (previous, next) {
+      if (previous != next) {
+        FunctionUtils.setAppBadgeCount(next);
+      }
+    });
     return Scaffold(
       body: SafeArea(child: _footerPageList[myAccount.userSetting.currentBottomNavigationIndex]),
       bottomNavigationBar: Container(
@@ -413,12 +418,12 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
           },
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async{
-          FunctionUtils.setAppBadgeCount(countAppBadge);
-        },
-        child: const Icon(Icons.add),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   onPressed: () async{
+      //     FunctionUtils.setAppBadgeCount(countAppBadge);
+      //   },
+      //   child: const Icon(Icons.add),
+      // ),
     );
   }
 }

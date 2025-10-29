@@ -288,6 +288,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                                           ref.read(userSettingProvider.notifier).state = account.userSetting;
                                           ref.read(selectedBottomMenuIndexProvider.notifier).state = account.userSetting.currentBottomNavigationIndex;
                                           ref.read(bottomNavigationMessageBadgeProvider.notifier).state = 0;
+                                          ref.read(countAppBadgeProvider.notifier).state = 0;
                                           //Authentication.myAccount = account;
                                           //ローディングを終了
                                           Loading.dismiss();

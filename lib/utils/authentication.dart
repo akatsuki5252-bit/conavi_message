@@ -213,6 +213,8 @@ class Authentication {
     FirebaseCloudMessaging.deleteToken(domain: domain,mid: mid);
     //通知を全てキャンセル
     await LocalNotifications.cancelAllNotifications();
+    //アプリバッチをクリア
+    FunctionUtils.clearAppBadgeCount();
     //プリファレンスを削除
     await SharedPrefs.removeAuth();
     await SharedPrefs.clear();
