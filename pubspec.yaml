@@ -103,11 +103,12 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   flutter_launcher_icons: ^0.14.4
 
-flutter_icons:
+flutter_launcher_icons:
   android: true
   ios: true
   image_path_android: "assets/icon/ic_launcher_512.png"
   image_path_ios: "assets/icon/ic_launcher_1024.png"
+  remove_alpha_ios: true
 
 flutter_native_splash:
   # ── 共通設定（Android / iOS 両対応） ──

@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:app_badge_plus/app_badge_plus.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:conavi_message/api/api_group_message.dart';
 import 'package:conavi_message/const/enum.dart';

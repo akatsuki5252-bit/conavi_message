@@ -196,9 +196,10 @@ class _MyAppState extends ConsumerState<MyApp> {
   Future<void> _initializeAppLogic(BuildContext context) async {
     //認証
     myAccount = await Authentication.autoLogin();
+    //通知を全てキャンセル
+    await LocalNotifications.cancelAllNotifications();
+    //認証判定
     if(myAccount is Auth){
-      //通知を全てキャンセル
-      await LocalNotifications.cancelAllNotifications();
       //認証トースト
       FunctionUtils.showToast(
           message: '認証完了',
@@ -227,7 +228,7 @@ class _MyAppState extends ConsumerState<MyApp> {
         ),
       );
     }else{
-
+      //未認証
       if (!mounted) return;
       //ログインなし
       Navigator.pushReplacement(
