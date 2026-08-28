@@ -343,7 +343,8 @@ class ApiMessages {
     required String senderFromId,
     required String senderToId,
     required String message,
-    required String domain}) async {
+    required String domain,
+    required MessageSendType sendType}) async {
 
     try {
       var url = Uri.parse('$domain/api/message/send_message.php');
@@ -352,6 +353,7 @@ class ApiMessages {
         'sender_from_id': senderFromId,
         'sender_to_id': senderToId,
         'message': message,
+        'silent_flg': sendType == MessageSendType.silent ? '1' : '0'
       });
       if (response.statusCode == 200) {
         Map<String, dynamic> data = jsonDecode(response.body);

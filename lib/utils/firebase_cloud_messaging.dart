@@ -60,7 +60,7 @@ class FirebaseCloudMessaging {
           break;
         }
         retry++;
-        FunctionUtils.log('⚠️ まだAPNsトークンがnull、再試行 ($retry/10)');
+        FunctionUtils.log('⚠️ まだAPNsトークンがnull、再試行 ($retry/5)');
         await Future.delayed(const Duration(seconds: 1)); // ←ここで1秒待つ
       }
       if (apnsToken == null) {

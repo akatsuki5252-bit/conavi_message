@@ -269,6 +269,13 @@ class FunctionUtils {
     if(isSupported) {
       await AppBadgePlus.updateBadge(badgeCount);
     }
+    // try {
+    //   await AppBadgePlus.updateBadge(badgeCount);
+    //   FunctionUtils.log('Badge update success: $badgeCount');
+    // } catch (e, stackTrace) {
+    //   FunctionUtils.log('Badge update error: $e');
+    //   FunctionUtils.log('Badge stackTrace: $stackTrace');
+    // }
   }
 
   static Future<void> clearAppBadgeCount() async {

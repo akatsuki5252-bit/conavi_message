@@ -10,6 +10,7 @@ import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/model/message.dart';
 import 'package:conavi_message/model/talk_room.dart';
+import 'package:conavi_message/utils/file_piker_helper.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/upload_file.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
@@ -23,19 +24,21 @@ import 'package:conavi_message/utils/push_notifications.dart';
 import 'package:conavi_message/utils/shared_prefs.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/util/audio_view_page.dart';
-import 'package:conavi_message/view/util/file_picker_page.dart';
+import 'package:conavi_message/view/util/file_picker_page.dart' hide PickerFile;
 import 'package:conavi_message/view/util/image_view_page.dart';
 import 'package:conavi_message/view/util/pdf_view_page.dart';
 import 'package:conavi_message/view/util/video_view_page.dart';
-//**import 'package:file_picker/file_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-//**import 'package:image_picker/image_picker.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' as intl;
+import 'package:path/path.dart' as path;
 
 class MessageRoomPage extends ConsumerStatefulWidget {
   final TalkRoom talkRoom;
@@ -171,6 +174,40 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
           ),
           onPressed: () {
             Navigator.pop(context, MessageFileType.file);
+          },
+        ),
+      ],
+    );
+  }
+
+  //ファイル選択時のダイアログ
+  Widget showMessageSendTypeDialog(){
+    return SimpleDialog(
+      children: [
+        SimpleDialogOption(
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('通常メッセージ'),
+              Icon(Icons.volume_up,color: Colors.amber)
+            ],
+          ),
+          onPressed: () {
+            Navigator.pop(context, MessageSendType.normal);
+          },
+        ),
+        SimpleDialogOption(
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('サイレントメッセージ'),
+              Icon(Icons.volume_off,color: Colors.amber)
+            ],
+          ),
+          onPressed: () {
+            Navigator.pop(context, MessageSendType.silent);
           },
         ),
       ],
@@ -462,6 +499,10 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                         maxWidth: 40,
                                       ),
                                       onPressed: () async {
+                                        //キーボードを閉じる
+                                        FocusManager.instance.primaryFocus?.unfocus();
+                                        //フォーカスを外す
+                                        FocusScope.of(context).unfocus();
                                         try {
                                           final pickedFile = await ImagePicker().pickImage(source: ImageSource.camera);
                                           if (pickedFile == null) throw Exception('file:null');
@@ -489,29 +530,95 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                         maxWidth: 40,
                                       ),
                                       onPressed: () async {
+                                        //キーボードを閉じる
+                                        FocusManager.instance.primaryFocus?.unfocus();
+                                        //フォーカスを外す
+                                        FocusScope.of(context).unfocus();
+                                        //ファイル選択ダイアログを表示
                                         final selectedFileType = await showDialog<MessageFileType>(
                                             context: context,
                                             builder: (_) {
                                               return showFileTypeDialog();
                                             });
                                         if(selectedFileType == null) return;
-                                        if (!context.mounted) return;
-                                        // //フォーカスを外す
-                                        FocusScope.of(context).unfocus();
-                                        var result = await Navigator.push(context,
-                                          MaterialPageRoute(
-                                            builder: (context) => FilePickerPage(
-                                                fileType: selectedFileType,
-                                                multipleType: true,
-                                                limitImageFileSize: 10.0,
-                                                limitFileSize: 100.0),
-                                          ),
-                                        );
-                                        FunctionUtils.log("result: $result");
-                                        if (result is List<PickerFile>) {
+
+                                        List<PickerFile> pickFiles = [];
+                                        List<PickerFile> compressFiles = [];
+                                        int maxBytes = 10 * 1024 * 1024;
+
+                                        try{
+                                          pickFiles = await FilePickerHelper.pick(type: selectedFileType);
+                                          if (pickFiles.isEmpty) throw Exception('file:null');
+                                          FunctionUtils.log(pickFiles);
+                                          for(var pickFile in pickFiles){
+                                            if(await FilePickerHelper.isCheckFileSize(selectedFileType, pickFile.file, maxBytes)){
+                                              if (selectedFileType == MessageFileType.image) {
+
+                                                final fileSizeBytes = await pickFile.file.length(); // await 必須
+                                                final sizeMB = (maxBytes).toStringAsFixed(2);
+
+                                                final result = await showDialog<bool>(
+                                                  context: context,
+                                                  builder: (_) => AlertDialog(
+                                                    title: const Text('ファイルサイズが大きすぎます'),
+                                                    content: Text('選択したファイルは ${sizeMB}MB です。\n'
+                                                        '最大10MB まで圧縮して送信しますか？'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () => Navigator.pop(context, false),
+                                                        child: const Text('キャンセル'),
+                                                      ),
+                                                      ElevatedButton(
+                                                        onPressed: () => Navigator.pop(context, true),
+                                                        child: const Text('圧縮する'),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                );
+
+                                                if (result == true){
+                                                  final file = await FilePickerHelper.compressImageFileToLimit(pickFile.file,maxBytes);
+                                                  if(file != null){
+                                                    pickFile.file = file;
+                                                    compressFiles.add(pickFile);
+                                                  }else{
+                                                    FunctionUtils.showToast(
+                                                        message: '圧縮エラー',
+                                                        toastLength: Toast.LENGTH_SHORT,
+                                                        toastGravity: ToastGravity.BOTTOM ,
+                                                        time: 1,
+                                                        backgroundColor: const Color(0xff3166f7),
+                                                        textColor: Colors.white,
+                                                        textSize: 16.0,
+                                                        cancelFlg: true
+                                                    );
+                                                  }
+                                                }
+                                              }else{
+                                                FunctionUtils.showToast(
+                                                    message: 'ファイルサイズオーバー',
+                                                    toastLength: Toast.LENGTH_SHORT,
+                                                    toastGravity: ToastGravity.BOTTOM ,
+                                                    time: 1,
+                                                    backgroundColor: const Color(0xff3166f7),
+                                                    textColor: Colors.white,
+                                                    textSize: 16.0,
+                                                    cancelFlg: true
+                                                );
+                                              }
+                                            }else{
+                                              if (selectedFileType == MessageFileType.image) {
+                                                pickFile.file = await FilePickerHelper.compressImageFile(pickFile.file);
+                                                compressFiles.add(pickFile);
+                                              }else{
+                                                compressFiles.add(pickFile);
+                                              }
+                                            }
+                                          }
+
                                           List<File> files = [];
-                                          for(var pickerFile in result){
-                                            files.add(File(pickerFile.file.path));
+                                          for(var compressFile in compressFiles){
+                                            files.add(File(compressFile.file.path));
                                           }
                                           sendUploads(
                                             talkRoom: widget.talkRoom,
@@ -522,24 +629,9 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                             files: files,
                                             pushMemberIds: _pushMemberIds,
                                           );
+                                        } catch (e) {
+                                          FunctionUtils.log('Failed to pick file: $e');
                                         }
-
-
-                                        // if(result is List<ImageFile>){
-                                        //   List<File> files = [];
-                                        //   for(var image in result){
-                                        //     files.add(File(image.file.path));
-                                        //   }
-                                        //   sendUploads(
-                                        //       talkRoom: widget.talkRoom,
-                                        //       myAccount: myAccount,
-                                        //       sendFromId: _sendFromId,
-                                        //       sendToId: _sendToId,
-                                        //       message: '画像を送信しました',
-                                        //       files: files,
-                                        //       pushMemberIds: _pushMemberIds,
-                                        //       limitSize: 5.0);
-                                        // }
                                       },
                                       icon: const Icon(Icons.image_outlined, color: Colors.grey),
                                     ),
@@ -583,36 +675,54 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                   ),
                                 ),
                               ),
+                              //送信ボタン
                               IconButton(
                                 onPressed: () async {
+                                  //メッセージ送信
+                                  _sendMessage(account: myAccount, sendType: MessageSendType.normal);
+                                  // if (controller.text.isNotEmpty) {
+                                  //
+                                  //   var sendText = controller.text;
+                                  //   //フォーカスを外す
+                                  //   FocusScope.of(context).unfocus();
+                                  //   //入力テキストクリア
+                                  //   controller.clear();
+                                  //   //保存している入力文字をクリア
+                                  //   await SharedPrefs.setRoomMessage(roomId: widget.talkRoom.roomId, message: '');
+                                  //   //メッセージ送信
+                                  //   var result = await ApiMessages.sendMessage(
+                                  //       roomId: widget.talkRoom.roomId,
+                                  //       senderFromId: _sendFromId,
+                                  //       senderToId: _sendToId,
+                                  //       message: sendText,
+                                  //       domain: myAccount.domain.url);
+                                  //   if (result) {
+                                  //     //画面リロード
+                                  //     _reload();
+                                  //     //プッシュ通知
+                                  //     await sendPushNotification(
+                                  //       account: myAccount,
+                                  //       roomId: widget.talkRoom.roomId,
+                                  //       title: myAccount.member.name,
+                                  //       body: sendText,
+                                  //       memberIds: _pushMemberIds,
+                                  //       imageUrl: myAccount.member.imagePath.isNotEmpty ? '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}' : ''
+                                  //     );
+                                  //   }
+                                  // }
+                                },
+                                onLongPress: () async{
                                   if (controller.text.isNotEmpty) {
-                                    var sendText = controller.text;
-                                    //フォーカスを外す
-                                    FocusScope.of(context).unfocus();
-                                    //入力テキストクリア
-                                    controller.clear();
-                                    //保存している入力文字をクリア
-                                    await SharedPrefs.setRoomMessage(roomId: widget.talkRoom.roomId, message: '');
-                                    //メッセージ送信
-                                    var result = await ApiMessages.sendMessage(
-                                        roomId: widget.talkRoom.roomId,
-                                        senderFromId: _sendFromId,
-                                        senderToId: _sendToId,
-                                        message: sendText,
-                                        domain: myAccount.domain.url);
-                                    if (result) {
-                                      //画面リロード
-                                      _reload();
-                                      //プッシュ通知
-                                      await sendPushNotification(
-                                        account: myAccount,
-                                        roomId: widget.talkRoom.roomId,
-                                        title: myAccount.member.name,
-                                        body: sendText,
-                                        memberIds: _pushMemberIds,
-                                        imageUrl: myAccount.member.imagePath.isNotEmpty ? '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}' : ''
-                                      );
-                                    }
+                                    //FunctionUtils.log('長押し');
+                                    FocusManager.instance.primaryFocus?.unfocus();
+                                    //ファイル選択ダイアログを表示
+                                    final selectedSendType = await showDialog<MessageSendType>(
+                                        context: context,
+                                        builder: (_) {
+                                          return showMessageSendTypeDialog();
+                                        });
+                                    if (selectedSendType == null) return;
+                                    _sendMessage(account: myAccount, sendType: selectedSendType);
                                   }
                                 },
                                 icon: const Icon(
@@ -976,6 +1086,47 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
           ),
         ),
       );
+    }
+  }
+
+  Future<void> _sendMessage({
+    required Auth account,
+    required MessageSendType sendType,
+  }) async {
+    if (controller.text.isNotEmpty) {
+      var sendText = controller.text;
+      //フォーカスを外す
+      FocusScope.of(context).unfocus();
+      //入力テキストクリア
+      controller.clear();
+      //保存している入力文字をクリア
+      await SharedPrefs.setRoomMessage(roomId: widget.talkRoom.roomId, message: '');
+      //メッセージ送信
+      var result = await ApiMessages.sendMessage(
+          roomId: widget.talkRoom.roomId,
+          senderFromId: _sendFromId,
+          senderToId: _sendToId,
+          message: sendText,
+          domain: account.domain.url,
+          sendType: sendType
+      );
+      if (result) {
+        //画面リロード
+        _reload();
+        //プッシュ通知（通常メッセージのみプッシュ通知）
+        if (sendType == MessageSendType.normal) {
+          await sendPushNotification(
+              account: account,
+              roomId: widget.talkRoom.roomId,
+              title: account.member.name,
+              body: sendText,
+              memberIds: _pushMemberIds,
+              imageUrl: account.member.imagePath.isNotEmpty ? '${account.domain
+                  .url}/api/upload/file.php?member_id=${account.member
+                  .id}&app_token=${account.member.appToken}' : ''
+          );
+        }
+      }
     }
   }
 

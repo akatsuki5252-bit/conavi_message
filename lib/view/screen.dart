@@ -158,6 +158,9 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addObserver(this);
+    });
 
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
     //   final settings = await FirebaseMessaging.instance.getNotificationSettings();
@@ -170,7 +173,6 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
 
 
     final myAccount = ref.read(authProvider);
-    WidgetsBinding.instance.addObserver(this);
     FunctionUtils.log('isAppUpdate:${myAccount.userSetting.isAppUpdate}');
     //バージョンチェック（build完了後）
     WidgetsBinding.instance.addPostFrameCallback((_){
@@ -226,6 +228,9 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
 
     //FCM：フォアグラウンド
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('===== RemoteMessage 全ログ =====');
+      print(jsonEncode(message.toMap()));
+      print('================================');
       //下部メッセージメニューを選択中 + メッセージ画面を表示 + 受信した通知がメッセージ画面の相手の場合、ローカル通知を通知しない
       FunctionUtils.log('FirebaseMessaging.onMessage.listen');
       if (message.notification != null) {
@@ -309,16 +314,10 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     FunctionUtils.log("stete = $state");
+    final myAccount = ref.read(authProvider);
     switch (state) {
-      case AppLifecycleState.inactive:
-        FunctionUtils.log('非アクティブになったときの処理');
-        break;
-      case AppLifecycleState.paused:
-        FunctionUtils.log('停止されたときの処理');
-        break;
       case AppLifecycleState.resumed:
         FunctionUtils.log('再開されたときの処理');
-        final myAccount = ref.read(authProvider);
         //メッセージメニュー画面選択
         if(myAccount.userSetting.currentBottomNavigationIndex == BottomNavigationMenu.message.index) {
           //メッセージのメッセージ画面を表示中はメッセージを更新
@@ -335,11 +334,18 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
           }
         }
         break;
+      case AppLifecycleState.inactive:
+        FunctionUtils.log('非アクティブになったときの処理');
+        break;
+      case AppLifecycleState.paused:
+        FunctionUtils.log('停止されたときの処理');
+        break;
       case AppLifecycleState.detached:
         FunctionUtils.log('破棄されたときの処理');
         break;
       case AppLifecycleState.hidden:
-        // TODO: Handle this case.
+        FunctionUtils.log('ウィンドウ非表示 hidden (iPad用)');
+        break;
     }
   }
 

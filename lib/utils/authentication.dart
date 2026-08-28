@@ -59,6 +59,8 @@ class Authentication {
     FunctionUtils.log('アプリバージョン：${packageInfo.version}');
     //初回ログインのみ更新
     if(appToken.isEmpty) {
+      //FCMトークンをリセット
+      await FirebaseCloudMessaging.deleteToken(mid: member.id, domain: domainUrl);
       //FCMトークンを更新
       account.member.fcmToken = await FirebaseCloudMessaging.updateToken(domain: domainUrl, mid: member.id);
       //端末情報を更新

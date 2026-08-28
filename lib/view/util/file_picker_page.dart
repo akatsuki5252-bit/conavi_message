@@ -495,7 +495,8 @@ class _FilePickerPageState extends State<FilePickerPage>{
 
   Future<Uint8List?> compressFile(File file,int quality) async {
     FunctionUtils.log('compressFile');
-    final size = ImageSizeGetter.getSize(FileInput(file));
+    final sizeResult = ImageSizeGetter.getSizeResult(FileInput(file));
+    final size = sizeResult.size;
     final fileSize = file.readAsBytesSync().lengthInBytes.toDouble();
     FunctionUtils.log('width:${size.width},height:${size.height},size:${fileSize}');
     final result = await FlutterImageCompress.compressWithFile(

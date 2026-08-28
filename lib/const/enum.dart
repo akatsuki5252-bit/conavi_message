@@ -24,6 +24,11 @@ enum MessageFileType{
   image,
   file
 }
+///メッセージ：送信方法
+enum MessageSendType {
+  normal,
+  silent,
+}
 ///下部メニュー
 enum BottomNavigationMenu{
   message,

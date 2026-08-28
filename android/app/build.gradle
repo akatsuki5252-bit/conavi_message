@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     id "com.android.application"
     id "kotlin-android"
@@ -25,7 +28,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "net.conavi.aps.conavimessage"
-    compileSdkVersion 35
+    compileSdkVersion 36
     ndkVersion "29.0.14206865"
     //ndkVersion flutter.ndkVersion
 
@@ -49,7 +52,7 @@ android {
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-build-configuration.
         minSdkVersion 24
-        targetSdkVersion 35
+        targetSdkVersion 36
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
