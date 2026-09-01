@@ -92,9 +92,9 @@ class LocalNotifications {
 
     // iOS 初期化
     final DarwinInitializationSettings initializationSettingsDarwin = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
       notificationCategories: darwinNotificationCategories,
     );
     final InitializationSettings initializationSettings = InitializationSettings(
@@ -365,12 +365,12 @@ class LocalNotifications {
         FunctionUtils.log('requestNotificationsPermission:clear');
       }
 
-      final bool? granted2 = await androidImplementation?.requestExactAlarmsPermission();
-      if (granted2 == null || !granted2) {
-        FunctionUtils.log('requestExactAlarmsPermission:not requestPermission');
-      }else{
-        FunctionUtils.log('requestExactAlarmsPermission:clear');
-      }
+      // final bool? granted2 = await androidImplementation?.requestExactAlarmsPermission();
+      // if (granted2 == null || !granted2) {
+      //   FunctionUtils.log('requestExactAlarmsPermission:not requestPermission');
+      // }else{
+      //   FunctionUtils.log('requestExactAlarmsPermission:clear');
+      // }
     }
   }
 }

@@ -285,7 +285,7 @@ class ApiMessages {
                 talkMember = member;
               }
             }
-            FunctionUtils.log(talkMember);
+            //FunctionUtils.log(talkMember);
             talkMember ??= Member(
               id: '',
               name: '削除されたユーザー',

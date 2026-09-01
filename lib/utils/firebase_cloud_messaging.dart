@@ -46,11 +46,15 @@ class FirebaseCloudMessaging {
 
     // 🔹 iOSの場合はAPNsトークンが得られるまで少し待つ
     if (Platform.isIOS) {
-      final settings = await messaging.requestPermission();
-      if (settings.authorizationStatus != AuthorizationStatus.authorized) {
-        FunctionUtils.log('🔕 通知が拒否されているため、FCMトークンを取得しません');
+      final settings = await messaging.getNotificationSettings();
+      if (settings.authorizationStatus != AuthorizationStatus.authorized &&
+          settings.authorizationStatus != AuthorizationStatus.provisional) {
+        FunctionUtils.log(
+            '🔕 通知が許可されていないため、FCMトークンを取得しません'
+        );
         return '';
       }
+
       String? apnsToken;
       int retry = 0;
       while (apnsToken == null && retry < 5) {

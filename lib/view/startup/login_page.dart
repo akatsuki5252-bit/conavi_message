@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:conavi_message/api/api_communitys.dart';
 import 'package:conavi_message/api/api_domains.dart';
 import 'package:conavi_message/api/api_members.dart';
@@ -18,6 +20,7 @@ import 'package:conavi_message/view/invite_code/create_member_page.dart';
 import 'package:conavi_message/view/screen.dart';
 import 'package:conavi_message/view/community/create_community_page.dart';
 import 'package:conavi_message/view/startup/password_reset_page.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -57,17 +60,34 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     showAppVersion();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      // 通知権限があるかチェック
-      final granted = await LocalNotifications.isNotificationPermissionGranted();
-      if (!granted) {
-        // 通知権限リクエスト
-        await LocalNotifications.requestPermissions().catchError((e) {
-          FunctionUtils.log('LocalNotifications permission error: $e');
-        });
-        // FCMの通知権限リクエスト
-        await FirebaseCloudMessaging.requestPermissions().catchError((e) {
-          FunctionUtils.log('FirebaseCloudMessaging permission error: $e');
-        });
+
+      if (Platform.isIOS) {
+        // iOS
+        final settings = await FirebaseMessaging.instance.getNotificationSettings();
+
+        FunctionUtils.log(
+          '🔔 iOS Notification Status: ${settings.authorizationStatus}',
+        );
+
+        // まだ一度も通知許可を確認していない場合だけ要求
+        if (settings.authorizationStatus == AuthorizationStatus.notDetermined) {
+          await FirebaseCloudMessaging.requestPermissions().catchError((e) {
+            FunctionUtils.log(
+              'FirebaseCloudMessaging permission error: $e',
+            );
+          });
+        }
+      } else if (Platform.isAndroid) {
+        // Android
+        final granted = await LocalNotifications.isNotificationPermissionGranted();
+
+        if (!granted) {
+          await LocalNotifications.requestPermissions().catchError((e) {
+            FunctionUtils.log(
+              'LocalNotifications permission error: $e',
+            );
+          });
+        }
       }
     });
   }
