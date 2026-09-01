@@ -77,8 +77,6 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     ref.read(membersFutureProvider);
     ref.read(talkRoomsFutureProvider);
 
-    FunctionUtils.setAppBadgeCount(99);
-
     return GestureDetector(
       onTap: () => primaryFocus?.unfocus(),
       child: Scaffold(
