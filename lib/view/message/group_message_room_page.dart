@@ -45,6 +45,28 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
   void initState() {
     super.initState();
     _isEntry = widget.talkRoom.isEntry;
+
+    // build完了後
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      // ルームidをセット
+      ref.read(selectedGroupMessageRoomProvider.notifier).state = widget.talkRoom;
+
+      final talkRoom = ref.read(selectedGroupMessageRoomProvider);
+      if(talkRoom is TalkGroupRoom) {
+        FunctionUtils.log('currentTalkRoomId:${talkRoom.roomId}');
+      }
+
+      // このグループルームの未読数を減らす
+      final unreadCount = widget.talkRoom.countUnRead;
+
+      if (unreadCount > 0) {
+        final currentCount = ref.read(countGroupMessageUnReadProvider);
+        final newCount = currentCount - unreadCount;
+
+        ref.read(countGroupMessageUnReadProvider.notifier).state =
+        newCount < 0 ? 0 : newCount;
+      }
+    });
   }
 
   //メッセージタップ時のダイアログ
@@ -178,15 +200,6 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
 
   @override
   Widget build(BuildContext context) {
-    //build完了後
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      //ルームidをセット
-      ref.read(selectedGroupMessageRoomProvider.notifier).state = widget.talkRoom;
-      final talkRoom = ref.read(selectedGroupMessageRoomProvider);
-      if(talkRoom is TalkGroupRoom) {
-        FunctionUtils.log('currentTalkRoomId:${talkRoom.roomId}');
-      }
-    });
     final myAccount = ref.read(authProvider);
     final talkGroupMessageList = ref.watch(talkGroupMessagesFutureProvider(widget.talkRoom));
     return GestureDetector(

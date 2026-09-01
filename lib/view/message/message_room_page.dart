@@ -1,23 +1,18 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:bubble/bubble.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:chat_bubbles/chat_bubbles.dart';
 import 'package:conavi_message/const/enum.dart';
 import 'package:conavi_message/main.dart';
 import 'package:conavi_message/setting/auth.dart';
-import 'package:conavi_message/model/member.dart';
 import 'package:conavi_message/model/message.dart';
 import 'package:conavi_message/model/talk_room.dart';
 import 'package:conavi_message/utils/file_piker_helper.dart';
 import 'package:conavi_message/utils/loading.dart';
-import 'package:conavi_message/utils/upload_file.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/api/api_messages.dart';
-import 'package:conavi_message/utils/authentication.dart';
 import 'package:conavi_message/utils/custom_alert_dialog.dart';
 import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/push_notifications.dart';
@@ -28,11 +23,9 @@ import 'package:conavi_message/view/util/file_picker_page.dart' hide PickerFile;
 import 'package:conavi_message/view/util/image_view_page.dart';
 import 'package:conavi_message/view/util/pdf_view_page.dart';
 import 'package:conavi_message/view/util/video_view_page.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_cached_pdfview/flutter_cached_pdfview.dart';
-import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -74,6 +67,16 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
     WidgetsBinding.instance.addPostFrameCallback((_) {
       //ルームidをセット
       ref.read(selectedMessageRoomProvider.notifier).state = widget.talkRoom;
+
+      // このルームの未読数をアプリバッジから減らす
+      final unreadCount = widget.talkRoom.countUnRead;
+
+      if (unreadCount > 0) {
+        final currentCount = ref.read(countMessageUnReadProvider);
+        final newCount = currentCount - unreadCount;
+
+        ref.read(countMessageUnReadProvider.notifier).state = newCount < 0 ? 0 : newCount;
+      }
     });
     //ルームidの通知を削除
     flutterLocalNotificationsPlugin.cancel(int.parse(widget.talkRoom.roomId));

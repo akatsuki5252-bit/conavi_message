@@ -1,3 +1,4 @@
+import 'package:conavi_message/providers/user_setting_provider.dart';
 import 'package:conavi_message/setting/auth.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/message_provider.dart';
@@ -55,12 +56,17 @@ class _TabMessagePageState extends ConsumerState<TabMessagePage> {
                     splashColor: Colors.amber.shade100,
                     onTap: () {
                       Future.delayed(const Duration(milliseconds: 300), () async {
+
+                        if (!context.mounted) return;
+
                         var result = await Navigator.push(context,
                           MaterialPageRoute(
                             builder: (context) => MessageRoomPage(talkRoom),
                           ),
                         );
+
                         FunctionUtils.log('result:$result');
+
                         if (result is bool && result) {
                           // 状態を更新する
                           ref.refresh(talkRoomsFutureProvider);
