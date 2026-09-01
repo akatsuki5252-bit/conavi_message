@@ -1188,7 +1188,7 @@ PODS:
     - abseil/meta/type_traits
     - abseil/xcprivacy
   - abseil/xcprivacy (1.20240722.0)
-  - app_badge_plus (1.2.3):
+  - app_badge_plus (1.3.4):
     - Flutter
   - BoringSSL-GRPC (0.0.37):
     - BoringSSL-GRPC/Implementation (= 0.0.37)
@@ -1594,7 +1594,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
-  app_badge_plus: 73079d53b6a318c723de4d8aded465fbc4e92897
+  app_badge_plus: 31984ff4a2e27765f5d78ba4a6d450a8efbe56a9
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: 3e492984b292c052ae33914223a2602c96fa6cbd
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
