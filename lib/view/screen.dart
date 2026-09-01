@@ -160,6 +160,10 @@ class ScreenState extends ConsumerState<Screen> with WidgetsBindingObserver {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       WidgetsBinding.instance.addObserver(this);
+
+      // アプリ起動時に通知バッジを更新
+      final badgeCount = ref.read(countAppBadgeProvider);
+      FunctionUtils.setAppBadgeCount(badgeCount);
     });
 
     // WidgetsBinding.instance.addPostFrameCallback((_) async {
