@@ -8,6 +8,7 @@ import 'package:conavi_message/model/talk_group_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
 import 'package:conavi_message/providers/message_provider.dart';
 import 'package:conavi_message/providers/user_setting_provider.dart';
+import 'package:conavi_message/utils/file_piker_helper.dart';
 import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/utils/push_notifications.dart';
@@ -457,59 +458,57 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                             maxWidth: 40,
                                           ),
                                           onPressed: () async {
-                                            FocusScope.of(context).unfocus(); //フォーカスを外す
+                                            //キーボードを閉じる
+                                            FocusManager.instance.primaryFocus?.unfocus();
+                                            //フォーカスを外す
+                                            FocusScope.of(context).unfocus();
+                                            //ファイル選択ダイアログを表示
                                             final selectedFileType = await showDialog<MessageFileType>(
-                                                context: context,
-                                                builder: (_) {
-                                                  return WidgetDialogs.showFileTypeDialog(context);
-                                                });
-                                            if(selectedFileType == null) return;
-                                            FunctionUtils.log(selectedFileType);
-                                            if (!context.mounted) return;
-                                            var resultPickerFile = await Navigator.push(context,
-                                              MaterialPageRoute(builder: (context) => FilePickerPage(
-                                                fileType: selectedFileType,
-                                                multipleType: true,
-                                                limitImageFileSize: 10.0,
-                                                limitFileSize: 100.0,),
-                                              ),
+                                              context: context,
+                                              builder: (dialogContext) {
+                                                return WidgetDialogs.showFileTypeDialog(dialogContext);
+                                              },
                                             );
-                                            FunctionUtils.log("result: $resultPickerFile");
-                                            if (resultPickerFile is List<PickerFile>) {
-                                              List<File> files = [];
-                                              for(var pickerFile in resultPickerFile){
-                                                files.add(File(pickerFile.file.path));
-                                              }
-                                              //ローディングメッセージを表示
-                                              Loading.show(message: 'アップロード中...', isDismissOnTap: false,);
-                                              //アップロード処理
-                                              var result = await ApiGroupMessages.sendUploadFile(
+
+                                            if(selectedFileType == null) return;
+                                            if (!context.mounted) return;
+
+                                            final files = await FilePickerHelper.pickFilesWithSizeCheck(
+                                              context: context,
+                                              type: selectedFileType,
+                                            );
+
+                                            if (files.isEmpty) return;
+
+                                            //ローディングメッセージを表示
+                                            Loading.show(message: 'アップロード中...', isDismissOnTap: false,);
+                                            //アップロード処理
+                                            var result = await ApiGroupMessages.sendUploadFile(
+                                              domain: myAccount.domain.url,
+                                              roomId: widget.talkRoom.roomId,
+                                              sendMemberFromId: myAccount.member.id,
+                                              files: files,
+                                            );
+                                            if(result){
+                                              //画面リロード
+                                              ref.refresh(talkGroupMessagesFutureProvider(widget.talkRoom));
+                                              //プッシュ通知
+                                              bool result = await PushNotifications.sendPushGroupMessage(
                                                 domain: myAccount.domain.url,
                                                 roomId: widget.talkRoom.roomId,
-                                                sendMemberFromId: myAccount.member.id,
-                                                files: files,
+                                                type: 'groupMessage',
+                                                sendFromMemberId: myAccount.member.id,
+                                                uniqueKey: FunctionUtils.createUniqueKeyFromDate(widget.talkRoom.createdTime),
+                                                title: myAccount.member.name,
+                                                body: '${myAccount.member.name}がファイルを送信しました',
+                                                imageUrl: widget.talkRoom.imagePath
                                               );
-                                              if(result){
-                                                //画面リロード
-                                                ref.refresh(talkGroupMessagesFutureProvider(widget.talkRoom));
-                                                //プッシュ通知
-                                                bool result = await PushNotifications.sendPushGroupMessage(
-                                                  domain: myAccount.domain.url,
-                                                  roomId: widget.talkRoom.roomId,
-                                                  type: 'groupMessage',
-                                                  sendFromMemberId: myAccount.member.id,
-                                                  uniqueKey: FunctionUtils.createUniqueKeyFromDate(widget.talkRoom.createdTime),
-                                                  title: myAccount.member.name,
-                                                  body: '${myAccount.member.name}がファイルを送信しました',
-                                                  imageUrl: widget.talkRoom.imagePath
-                                                );
-                                                if(!result){
-                                                  FunctionUtils.log('プッシュ通知でエラーが発生');
-                                                }
-                                                Loading.dismiss();
-                                              } else {
-                                                Loading.error(message: 'アップロードに失敗しました');
+                                              if(!result){
+                                                FunctionUtils.log('プッシュ通知でエラーが発生');
                                               }
+                                              Loading.dismiss();
+                                            } else {
+                                              Loading.error(message: 'アップロードに失敗しました');
                                             }
                                           },
                                           icon: const Icon(Icons.image_outlined, color: Colors.grey),

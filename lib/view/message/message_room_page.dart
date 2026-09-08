@@ -17,6 +17,7 @@ import 'package:conavi_message/utils/custom_alert_dialog.dart';
 import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/push_notifications.dart';
 import 'package:conavi_message/utils/shared_prefs.dart';
+import 'package:conavi_message/utils/widget_dialogs.dart';
 import 'package:conavi_message/utils/widget_utils.dart';
 import 'package:conavi_message/view/util/audio_view_page.dart';
 import 'package:conavi_message/view/util/file_picker_page.dart' hide PickerFile;
@@ -145,40 +146,6 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
               Navigator.pop(context, MessageOption.delete);
             },
           )
-      ],
-    );
-  }
-
-  //ファイル選択時のダイアログ
-  Widget showFileTypeDialog(){
-    return SimpleDialog(
-      children: [
-        SimpleDialogOption(
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text('画像'),
-              Icon(Icons.image_outlined,color: Colors.amber)
-            ],
-          ),
-          onPressed: () {
-            Navigator.pop(context, MessageFileType.image);
-          },
-        ),
-        SimpleDialogOption(
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text('ファイル'),
-              Icon(Icons.insert_drive_file_outlined,color: Colors.amber)
-            ],
-          ),
-          onPressed: () {
-            Navigator.pop(context, MessageFileType.file);
-          },
-        ),
       ],
     );
   }
@@ -539,102 +506,31 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                         FocusScope.of(context).unfocus();
                                         //ファイル選択ダイアログを表示
                                         final selectedFileType = await showDialog<MessageFileType>(
-                                            context: context,
-                                            builder: (_) {
-                                              return showFileTypeDialog();
-                                            });
+                                          context: context,
+                                          builder: (dialogContext) {
+                                            return WidgetDialogs.showFileTypeDialog(dialogContext);
+                                          },
+                                        );
+
                                         if(selectedFileType == null) return;
+                                        if (!context.mounted) return;
 
-                                        List<PickerFile> pickFiles = [];
-                                        List<PickerFile> compressFiles = [];
-                                        int maxBytes = 10 * 1024 * 1024;
+                                        final files = await FilePickerHelper.pickFilesWithSizeCheck(
+                                          context: context,
+                                          type: selectedFileType,
+                                        );
 
-                                        try{
-                                          pickFiles = await FilePickerHelper.pick(type: selectedFileType);
-                                          if (pickFiles.isEmpty) throw Exception('file:null');
-                                          FunctionUtils.log(pickFiles);
-                                          for(var pickFile in pickFiles){
-                                            if(await FilePickerHelper.isCheckFileSize(selectedFileType, pickFile.file, maxBytes)){
-                                              if (selectedFileType == MessageFileType.image) {
+                                        if (files.isEmpty) return;
 
-                                                final fileSizeBytes = await pickFile.file.length(); // await 必須
-                                                final sizeMB = (maxBytes).toStringAsFixed(2);
-
-                                                final result = await showDialog<bool>(
-                                                  context: context,
-                                                  builder: (_) => AlertDialog(
-                                                    title: const Text('ファイルサイズが大きすぎます'),
-                                                    content: Text('選択したファイルは ${sizeMB}MB です。\n'
-                                                        '最大10MB まで圧縮して送信しますか？'),
-                                                    actions: [
-                                                      TextButton(
-                                                        onPressed: () => Navigator.pop(context, false),
-                                                        child: const Text('キャンセル'),
-                                                      ),
-                                                      ElevatedButton(
-                                                        onPressed: () => Navigator.pop(context, true),
-                                                        child: const Text('圧縮する'),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                );
-
-                                                if (result == true){
-                                                  final file = await FilePickerHelper.compressImageFileToLimit(pickFile.file,maxBytes);
-                                                  if(file != null){
-                                                    pickFile.file = file;
-                                                    compressFiles.add(pickFile);
-                                                  }else{
-                                                    FunctionUtils.showToast(
-                                                        message: '圧縮エラー',
-                                                        toastLength: Toast.LENGTH_SHORT,
-                                                        toastGravity: ToastGravity.BOTTOM ,
-                                                        time: 1,
-                                                        backgroundColor: const Color(0xff3166f7),
-                                                        textColor: Colors.white,
-                                                        textSize: 16.0,
-                                                        cancelFlg: true
-                                                    );
-                                                  }
-                                                }
-                                              }else{
-                                                FunctionUtils.showToast(
-                                                    message: 'ファイルサイズオーバー',
-                                                    toastLength: Toast.LENGTH_SHORT,
-                                                    toastGravity: ToastGravity.BOTTOM ,
-                                                    time: 1,
-                                                    backgroundColor: const Color(0xff3166f7),
-                                                    textColor: Colors.white,
-                                                    textSize: 16.0,
-                                                    cancelFlg: true
-                                                );
-                                              }
-                                            }else{
-                                              if (selectedFileType == MessageFileType.image) {
-                                                pickFile.file = await FilePickerHelper.compressImageFile(pickFile.file);
-                                                compressFiles.add(pickFile);
-                                              }else{
-                                                compressFiles.add(pickFile);
-                                              }
-                                            }
-                                          }
-
-                                          List<File> files = [];
-                                          for(var compressFile in compressFiles){
-                                            files.add(File(compressFile.file.path));
-                                          }
-                                          sendUploads(
-                                            talkRoom: widget.talkRoom,
-                                            myAccount: myAccount,
-                                            sendFromId: _sendFromId,
-                                            sendToId: _sendToId,
-                                            message: 'ファイルを送信しました',
-                                            files: files,
-                                            pushMemberIds: _pushMemberIds,
-                                          );
-                                        } catch (e) {
-                                          FunctionUtils.log('Failed to pick file: $e');
-                                        }
+                                        sendUploads(
+                                          talkRoom: widget.talkRoom,
+                                          myAccount: myAccount,
+                                          sendFromId: _sendFromId,
+                                          sendToId: _sendToId,
+                                          message: 'ファイルを送信しました',
+                                          files: files,
+                                          pushMemberIds: _pushMemberIds,
+                                        );
                                       },
                                       icon: const Icon(Icons.image_outlined, color: Colors.grey),
                                     ),
@@ -1169,64 +1065,48 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
     //ローディングメッセージを表示
     Loading.show(message: 'アップロード中...', isDismissOnTap: false);
 
-    //アップロード処理
-    var result = await ApiMessages.sendUploadFile(
-        roomId: talkRoom.roomId,
-        sendFromId: sendFromId,
-        sendToId: sendToId,
-        files: files,
-        domain: myAccount.domain.url);
-    if (result) {
-      //画面リロード
-      _reload();
-      //プッシュ通知
-      await sendPushNotification(
-        account: myAccount,
-        roomId: talkRoom.roomId,
-        title: myAccount.member.name,
-        body: message,
-        //controller.text,
-        memberIds: pushMemberIds,
-        imageUrl: myAccount.member.imagePath.isNotEmpty ? '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}' : ''
-      );
-      //ローディングを終了
+    try {
+      //アップロード処理
+      var result = await ApiMessages.sendUploadFile(
+          roomId: talkRoom.roomId,
+          sendFromId: sendFromId,
+          sendToId: sendToId,
+          files: files,
+          domain: myAccount.domain.url);
+      if (result) {
+        //画面リロード
+        _reload();
+        //プッシュ通知
+        await sendPushNotification(
+          account: myAccount,
+          roomId: talkRoom.roomId,
+          title: myAccount.member.name,
+          body: message,
+          //controller.text,
+          memberIds: pushMemberIds,
+          imageUrl: myAccount.member.imagePath.isNotEmpty ? '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}' : ''
+        );
+        //ローディングを終了
+        Loading.dismiss();
+      } else {
+        //エラーメッセージダイアログ
+        Loading.error(message: ApiMessages.error);
+      }
+    } catch (e) {
       Loading.dismiss();
-    } else {
-      //エラーメッセージダイアログ
-      Loading.error(message: ApiMessages.error);
-    }
+      FunctionUtils.log('Failed to upload file: $e');
 
-    // bool isEmptyExtension = false;
-    // bool isFileSizeOver = false;
-    // for(var file in files){
-    //   //拡張子チェック
-    //   // if(path.extension(file.path).isEmpty){
-    //   //   isEmptyExtension = true;
-    //   // }
-    //   //ファイルサイズチェック
-    //   // if(FunctionUtils.checkFileSize(file.readAsBytesSync().lengthInBytes.toDouble(),limitSize)){
-    //   //   isFileSizeOver = true;
-    //   // }
-    // }
-    //
-    // if(!isEmptyExtension && !isFileSizeOver) {
-    //
-    //
-    // }else{
-    //   if(isEmptyExtension) {
-    //     EasyLoading.showError(
-    //       '拡張子がありません',
-    //       dismissOnTap: true,
-    //       maskType: EasyLoadingMaskType.black,
-    //     );
-    //   }else if(isFileSizeOver){
-    //     EasyLoading.showError(
-    //       '最大アップロードサイズを超過しています:$limitSize MB',
-    //       dismissOnTap: true,
-    //       maskType: EasyLoadingMaskType.black,
-    //     );
-    //   }
-    // }
+      FunctionUtils.showToast(
+        message: 'ファイルのアップロードに失敗しました',
+        toastLength: Toast.LENGTH_SHORT,
+        toastGravity: ToastGravity.BOTTOM,
+        time: 1,
+        backgroundColor: const Color(0xff3166f7),
+        textColor: Colors.white,
+        textSize: 16.0,
+        cancelFlg: true,
+      );
+    }
   }
 
 }

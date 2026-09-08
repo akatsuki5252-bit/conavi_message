@@ -11,18 +11,16 @@ import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
 import 'package:conavi_message/view/invite_code/invite_code_page.dart';
 import 'package:conavi_message/view/mypage/edit_notification_page.dart';
-import 'package:conavi_message/view/mypage/edit_profile_page_backup.dart';
 import 'package:conavi_message/view/mypage/edit_profile_page.dart';
 import 'package:conavi_message/view/mypage/edit_profile_password_page.dart';
 import 'package:conavi_message/view/startup/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-//**import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 
 class MyPage extends ConsumerStatefulWidget {
-  const MyPage({Key? key}) : super(key: key);
+  const MyPage({super.key});
 
   @override
   ConsumerState<MyPage> createState() => _MyPageState();
@@ -30,26 +28,35 @@ class MyPage extends ConsumerStatefulWidget {
 
 class _MyPageState extends ConsumerState<MyPage> {
 
-  Image? _image; //メンバー画像
+  ImageProvider? _profileImage; //メンバー画像
 
   @override
   void initState(){
     super.initState();
-    setImage();
+    loadProfileImage();
   }
 
   //画像を更新
-  Future<void> setImage() async {
+  Future<void> loadProfileImage() async {
     final myAccount = ref.read(authProvider);
-    if(myAccount.member.imagePath.isNotEmpty) {
-      String url = '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}';
-      FunctionUtils.log(url);
-      final http.Response response = await http.get(Uri.parse(url));
-      if(mounted) {
+
+    if (myAccount.member.imagePath.isEmpty) {
+      return;
+    }
+
+    String url = '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}';
+    FunctionUtils.log(url);
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200 && mounted) {
         setState(() {
-          _image = Image.memory(response.bodyBytes, fit: BoxFit.contain);
+          _profileImage = MemoryImage(response.bodyBytes);
         });
       }
+    } catch (e) {
+      FunctionUtils.log('プロフィール画像取得エラー: $e');
     }
   }
 
@@ -139,7 +146,7 @@ class _MyPageState extends ConsumerState<MyPage> {
                         child: CircleAvatar(
                           radius: 32,
                           backgroundColor: Colors.grey,
-                          foregroundImage: _image?.image,
+                          foregroundImage: _profileImage,
                           child: myAccount.member.imagePath.isEmpty
                               ? const Icon(Icons.person, size: 50, color: Colors.white)
                               : null,
@@ -160,17 +167,19 @@ class _MyPageState extends ConsumerState<MyPage> {
                           highlightColor: Colors.amber.shade100,
                           splashColor: Colors.amber.shade100,
                           onTap: () async{
-                            Future.delayed(const Duration(milliseconds: 300), () async {
-                              var result = await Navigator.push(context,
-                                MaterialPageRoute(
-                                  builder: (context) => const EditProfilePage()
-                                ),
-                              );
-                              FunctionUtils.log(result);
-                              if(result is bool && result){
-                                setImage();
-                              }
-                            });
+                            await Future.delayed(const Duration(milliseconds: 300));
+                            if (!context.mounted) return;
+                            var result = await Navigator.push(context,
+                              MaterialPageRoute(
+                                  builder: (context) => EditProfilePage(
+                                    profileImage: _profileImage,
+                                  )
+                              ),
+                            );
+                            FunctionUtils.log(result);
+                            if(result is bool && result){
+                              loadProfileImage();
+                            }
                           },
                           //splashColor: Colors.pink,
                           child: const ListTile(

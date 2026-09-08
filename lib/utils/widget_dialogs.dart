@@ -75,7 +75,7 @@ class WidgetDialogs {
     );
   }
 
-  ///グループメッセージ操作画像ファイル選択ダイアログ
+  ///画像・ファイル選択ダイアログ
   static Widget showFileTypeDialog(BuildContext context){
     return SimpleDialog(
       children: [

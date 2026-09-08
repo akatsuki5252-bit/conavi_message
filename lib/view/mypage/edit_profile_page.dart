@@ -1,34 +1,25 @@
 import 'dart:io';
 
-import 'package:conavi_message/api/api_group_message.dart';
 import 'package:conavi_message/api/api_members.dart';
-import 'package:conavi_message/api/api_messages.dart';
 import 'package:conavi_message/const/enum.dart';
 import 'package:conavi_message/model/member.dart';
-import 'package:conavi_message/model/talk_group_room.dart';
-import 'package:conavi_message/model/talk_room.dart';
 import 'package:conavi_message/providers/auth_provider.dart';
-import 'package:conavi_message/providers/create_group_provider.dart';
-import 'package:conavi_message/providers/user_setting_provider.dart';
-import 'package:conavi_message/utils/custom_alert_dialog.dart';
 import 'package:conavi_message/utils/function_utils.dart';
 import 'package:conavi_message/utils/loading.dart';
-import 'package:conavi_message/utils/push_notifications.dart';
-import 'package:conavi_message/view/message/edit_group_name_page.dart';
-import 'package:conavi_message/view/message/invite_group_message_member_page.dart';
-import 'package:conavi_message/view/message/participate_group_member_page.dart';
-import 'package:conavi_message/view/message/select_message_member_page.dart';
 import 'package:conavi_message/view/mypage/edit_profile_introduction_page.dart';
 import 'package:conavi_message/view/mypage/edit_profile_name_page.dart';
-import 'package:conavi_message/view/util/choice_image_page.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:conavi_message/utils/widget_utils.dart';
+import 'package:conavi_message/utils/file_piker_helper.dart';
 import 'package:http/http.dart' as http;
 
 class EditProfilePage extends ConsumerStatefulWidget {
-  const EditProfilePage({Key? key}) : super(key: key);
+  final ImageProvider? profileImage;
+
+  const EditProfilePage({
+    super.key,
+    this.profileImage,
+  });
 
   @override
   ConsumerState<EditProfilePage> createState() => _EditProfilePageState();
@@ -36,35 +27,62 @@ class EditProfilePage extends ConsumerStatefulWidget {
 
 class _EditProfilePageState extends ConsumerState<EditProfilePage> {
 
-  Image? _image; //メンバー画像
-  String _name = ''; //メンバー名
-  String _selfIntroduction = ''; //自己紹介
+  ImageProvider? _profileImage; //メンバー画像
+  String _profileName = ''; //メンバー名
+  String _profileSelfIntroduction = ''; //自己紹介
   bool _isChanged = false; //変更フラグ
 
   @override
   void initState() {
     super.initState();
+
     final myAccount = ref.read(authProvider);
-    _name = myAccount.member.name;
-    _selfIntroduction = myAccount.member.selfIntroduction;
-    setProfile();
+
+    _profileName = myAccount.member.name;
+    _profileSelfIntroduction = myAccount.member.selfIntroduction;
+
+    // マイページからプロフィール画像を受け取る
+    _profileImage = widget.profileImage;
+
+    loadProfile();
+    // マイページ側で画像を取得できていない場合のみ取得
+    if (_profileImage == null) {
+      loadProfileImage();
+    }
   }
 
-  //グループ画像を更新
-  Future<void> setProfile() async {
+  //プロフィール情報読み込み
+  Future<void> loadProfile() async {
     final myAccount = ref.read(authProvider);
     final member = await ApiMembers.fetchProfile(domain:myAccount.domain.url,memberId:myAccount.member.id);
-    if(member is Member){
+    if(member is Member && mounted){
       ref.read(userProvider.notifier).state = member;
-      String url = '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}';
-      final http.Response response = await http.get(Uri.parse(url));
-      if(mounted) {
-        setState(() {
-          _image = response.bodyBytes.isNotEmpty ? Image.memory(response.bodyBytes, fit: BoxFit.contain) : null;
-          _name = member.name;
-          _selfIntroduction = member.selfIntroduction;
-        });
-      }
+      setState(() {
+        _profileName = member.name;
+        _profileSelfIntroduction = member.selfIntroduction;
+      });
+    }
+  }
+
+  //プロフィール画像
+  Future<void> loadProfileImage() async {
+    final myAccount = ref.read(authProvider);
+
+    if (myAccount.member.imagePath.isEmpty) {
+      return;
+    }
+
+    final url = '${myAccount.domain.url}/api/upload/file.php?member_id=${myAccount.member.id}&app_token=${myAccount.member.appToken}';
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (!mounted) return;
+
+      setState(() {
+        _profileImage = response.bodyBytes.isNotEmpty ? MemoryImage(response.bodyBytes) : null;
+      });
+    } catch (e) {
+      FunctionUtils.log('プロフィール画像取得エラー: $e');
     }
   }
 
@@ -97,35 +115,39 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                         ///メンバー画像
                         GestureDetector(
                           onTap: () async {
-                            var resultFiles = await Navigator.push(context,
-                              MaterialPageRoute(builder: (context) =>
-                                const ChoiceImagePage(
-                                  fileName: 'member',
-                                  multipleType: false,
-                                  limitFileSize: 5.0),
-                              ),
+                            final files = await FilePickerHelper.pickFilesWithSizeCheck(
+                              context: context,
+                              type: MessageFileType.image,
+                              allowMultiple: false
                             );
-                            File? imageFile;
-                            if (resultFiles is List<ImageFile>) {
-                              for (var image in resultFiles) {
-                                imageFile = image.file;
-                              }
-                            }
-                            if(imageFile != null){
-                              FunctionUtils.log(imageFile);
-                              //ローディングメッセージを表示
-                              Loading.show(message: '処理中...', isDismissOnTap: false);
+
+                            if (files.isEmpty) return;
+                            if (!mounted) return;
+
+                            final imageFile = files.first;
+                            FunctionUtils.log(imageFile);
+
+                            //ローディングメッセージを表示
+                            Loading.show(
+                              message: '処理中...',
+                              isDismissOnTap: false,
+                            );
+                            try {
                               bool result = await ApiMembers.uploadMemberFile(
                                 domain: myAccount.domain.url,
                                 uid: myAccount.member.id,
                                 uploadFile: imageFile,
                               );
+
                               FunctionUtils.log(result);
+
                               if(result){
-                                setProfile();
+                                await loadProfileImage();
                                 _isChanged = true;
                               }
-                              //ローディングを終了
+                            } catch (e) {
+                              FunctionUtils.log('プロフィール画像更新エラー: $e');
+                            } finally {
                               Loading.dismiss();
                             }
                           },
@@ -135,7 +157,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                               alignment: Alignment.bottomRight,
                               children: [
                                 CircleAvatar(
-                                  foregroundImage: _image?.image,
+                                  foregroundImage: _profileImage,
                                   backgroundColor: Colors.grey,
                                   radius: 32,
                                   child: const Icon(
@@ -182,7 +204,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                   MaterialPageRoute(builder: (context) => const EditProfileNamePage()),
                                 );
                                 if(result is bool && result){
-                                  setProfile();
+                                  await loadProfile();
                                   _isChanged = true;
                                 }
                               });
@@ -190,7 +212,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                             //splashColor: Colors.pink,
                             child: ListTile(
                               title: const Text('名前',style: TextStyle(color: Colors.grey,fontSize: 13)),
-                              subtitle: Text(_name,style: const TextStyle(color:Colors.black,fontSize: 17),),
+                              subtitle: Text(_profileName,style: const TextStyle(color:Colors.black,fontSize: 17),),
                               trailing: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -214,14 +236,14 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage> {
                                 MaterialPageRoute(builder: (context) => const EditProfileIntroductionPage()),
                               );
                               if(result is bool && result){
-                                setProfile();
+                                await loadProfile();
                                 _isChanged = true;
                               }
                             },
                             //splashColor: Colors.pink,
                             child: ListTile(
                               title: const Text('自己紹介',style: TextStyle(color: Colors.grey,fontSize: 13)),
-                              subtitle: Text(_selfIntroduction,style: const TextStyle(color:Colors.black,fontSize: 17),),
+                              subtitle: Text(_profileSelfIntroduction,style: const TextStyle(color:Colors.black,fontSize: 17),),
                               trailing: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [

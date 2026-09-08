@@ -26,6 +26,11 @@ class PickerFile {
 }
 
 class FilePickerHelper {
+
+  // ファイルサイズ上限
+  static const int maxMB = 5;
+  static const int maxBytes = maxMB * 1024 * 1024;
+
   /// ファイル選択 & サイズ制限付き圧縮判定
   ///
   /// [type]        : 画像 or その他
@@ -36,6 +41,7 @@ class FilePickerHelper {
   /// [onCancel]    : キャンセルされたとき
   static Future<List<PickerFile>> pick({
     required MessageFileType type,
+    bool allowMultiple = true,
     int maxCount = 5
   }) async {
 
@@ -44,14 +50,22 @@ class FilePickerHelper {
     try {
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: type == MessageFileType.image ? FileType.image : FileType.any,
-        allowMultiple: maxCount > 1,
+        allowMultiple: allowMultiple,
       );
-      if (result == null) return [];
 
-      final paths = result.paths.whereType<String>().take(maxCount);
+      if (result == null || result.files.isEmpty) {
+        return [];
+      }
+
+      // 複数選択の場合はmaxCountまで、単一選択の場合は1件のみ
+      final paths = result.paths
+          .whereType<String>()
+          .take(allowMultiple ? maxCount : 1)
+          .toList();
 
       for (int i = 0; i < paths.length; i++) {
-        File file = File(paths.elementAt(i));
+
+        File file = File(paths[i]);
 
         /// リネーム（時間-index.拡張子）
         final dir = path.dirname(file.path);
@@ -89,7 +103,8 @@ class FilePickerHelper {
       ) async {
     try {
       final size = await file.length();
-      return type == MessageFileType.image && size > maxBytes;
+      //return type == MessageFileType.image && size > maxBytes;
+      return size > maxBytes;
     } catch (_) {
       return false; // 読めない時はサイズNGとして false（判定しない）
     }
@@ -171,11 +186,12 @@ class FilePickerHelper {
         }
         if (compressedBytes.length <= maxBytes) {
           file.writeAsBytesSync(compressedBytes);
-          break;
+          return file;
         }
         quality -= 10;
       }
-      return file;
+      // quality 10でも上限以下にならなかった
+      return null;
     } catch (e) {
       FunctionUtils.log('[compress] Error: $e');
       return null;
@@ -210,5 +226,125 @@ class FilePickerHelper {
         ],
       ),
     );
+  }
+
+  static bool isCompressibleImage(File file) {
+    final ext = path.extension(file.path).toLowerCase();
+
+    return [
+      '.jpg',
+      '.jpeg',
+      '.png',
+      '.webp',
+    ].contains(ext);
+  }
+
+  static Future<List<File>> pickFilesWithSizeCheck({
+    required BuildContext context,
+    required MessageFileType type,
+    bool allowMultiple = true,
+  }) async {
+    List<PickerFile> pickFiles = [];
+    List<PickerFile> compressFiles = [];
+
+    try {
+      pickFiles = await pick(
+        type: type,
+        allowMultiple: allowMultiple,
+      );
+
+      if (pickFiles.isEmpty) {
+        return [];
+      }
+
+      FunctionUtils.log(pickFiles);
+
+      for (var pickFile in pickFiles) {
+
+        // サイズオーバー
+        if (await isCheckFileSize(type, pickFile.file, maxBytes)) {
+
+          // 圧縮可能な画像
+          if (isCompressibleImage(pickFile.file)) {
+
+            final fileSizeBytes = await pickFile.file.length();
+            final sizeMB = fileSizeBytes / (1024 * 1024);
+
+            final result = await showDialog<bool>(
+              context: context,
+              builder: (_) => AlertDialog(
+                title: const Text('ファイルサイズが大きすぎます'),
+                content: Text(
+                  '選択したファイルは ${sizeMB.toStringAsFixed(2)}MB です。\n'
+                      '最大${maxMB}MB まで圧縮して送信しますか？',
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, false),
+                    child: const Text('キャンセル'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => Navigator.pop(context, true),
+                    child: const Text('圧縮する'),
+                  ),
+                ],
+              ),
+            );
+
+            if (result == true) {
+              final file = await compressImageFileToLimit(
+                pickFile.file,
+                maxBytes,
+              );
+
+              if (file != null) {
+                pickFile.file = file;
+                compressFiles.add(pickFile);
+              } else {
+                FunctionUtils.showToast(
+                  message: '圧縮エラー',
+                  toastLength: Toast.LENGTH_SHORT,
+                  toastGravity: ToastGravity.BOTTOM,
+                  time: 1,
+                  backgroundColor: const Color(0xff3166f7),
+                  textColor: Colors.white,
+                  textSize: 16.0,
+                  cancelFlg: true,
+                );
+              }
+            }
+
+          } else {
+            FunctionUtils.showToast(
+              message: 'ファイルサイズオーバー',
+              toastLength: Toast.LENGTH_SHORT,
+              toastGravity: ToastGravity.BOTTOM,
+              time: 1,
+              backgroundColor: const Color(0xff3166f7),
+              textColor: Colors.white,
+              textSize: 16.0,
+              cancelFlg: true,
+            );
+          }
+
+        } else {
+
+          // サイズ制限以内
+          if (type == MessageFileType.image) {
+            pickFile.file = await compressImageFile(pickFile.file);
+          }
+
+          compressFiles.add(pickFile);
+        }
+      }
+
+      return compressFiles
+          .map((compressFile) => File(compressFile.file.path))
+          .toList();
+
+    } catch (e) {
+      FunctionUtils.log('Failed to pick file: $e');
+      return [];
+    }
   }
 }
