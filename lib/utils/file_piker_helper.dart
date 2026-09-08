@@ -28,7 +28,7 @@ class PickerFile {
 class FilePickerHelper {
 
   // ファイルサイズ上限
-  static const int maxMB = 5;
+  static const int maxMB = 10;
   static const int maxBytes = maxMB * 1024 * 1024;
 
   /// ファイル選択 & サイズ制限付き圧縮判定
