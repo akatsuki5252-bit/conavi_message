@@ -14,9 +14,24 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		D73DE2C220313C996D01A042 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AB7E86E02B996FCA52D7CD90 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		BD8EF993304FF22B0023F796 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BD9D19E62EB3FA6F001D3671 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = 987FCFBD205656FAC82BB392E2B8884A;
+			remoteInfo = app_badge_plus;
+		};
+		BD8EF995304FF22B0023F796 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BD9D19E62EB3FA6F001D3671 /* Pods.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BCD7C7CA1EC8C84B43D8FBCE979CE379;
+			remoteInfo = "app_badge_plus-app_badge_plus_privacy";
+		};
 		BD9D1B582EB3FA70001D3671 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = BD9D19E62EB3FA6F001D3671 /* Pods.xcodeproj */;
@@ -628,6 +643,7 @@
 		97C146FD1CF9000F007C117D /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		97C147001CF9000F007C117D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		AB7E86E02B996FCA52D7CD90 /* GoogleService-Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "Runner/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BD0E99352EA8FE04000324BD /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		BD9D00002EB3FA6F001D3671 /* FIRAppInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FIRAppInternal.h; sourceTree = "<group>"; };
 		BD9D00012EB3FA6F001D3671 /* FIRComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FIRComponent.h; sourceTree = "<group>"; };
@@ -8328,6 +8344,7 @@
 				97C146EF1CF9000F007C117D /* Products */,
 				05F63B81D41D4564B27CEDCF /* Pods */,
 				AE3FFAFEA5CC1B1BA797F528 /* Frameworks */,
+				AB7E86E02B996FCA52D7CD90 /* GoogleService-Info.plist */,
 			);
 			sourceTree = "<group>";
 		};
@@ -22900,6 +22917,8 @@
 			children = (
 				BD9D1B592EB3FA70001D3671 /* absl.framework */,
 				BD9D1B5B2EB3FA70001D3671 /* xcprivacy.bundle */,
+				BD8EF994304FF22B0023F796 /* app_badge_plus.framework */,
+				BD8EF996304FF22B0023F796 /* app_badge_plus_privacy.bundle */,
 				BD9D1B612EB3FA70001D3671 /* openssl_grpc.framework */,
 				BD9D1B632EB3FA70001D3671 /* openssl_grpc.bundle */,
 				BD9D1B652EB3FA70001D3671 /* cloud_firestore.framework */,
@@ -26476,6 +26495,20 @@
 /* End PBXProject section */
 
 /* Begin PBXReferenceProxy section */
+		BD8EF994304FF22B0023F796 /* app_badge_plus.framework */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.framework;
+			path = app_badge_plus.framework;
+			remoteRef = BD8EF993304FF22B0023F796 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
+		BD8EF996304FF22B0023F796 /* app_badge_plus_privacy.bundle */ = {
+			isa = PBXReferenceProxy;
+			fileType = wrapper.cfbundle;
+			path = app_badge_plus_privacy.bundle;
+			remoteRef = BD8EF995304FF22B0023F796 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 		BD9D1B592EB3FA70001D3671 /* absl.framework */ = {
 			isa = PBXReferenceProxy;
 			fileType = wrapper.framework;
@@ -27068,6 +27101,7 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				D73DE2C220313C996D01A042 /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -27325,7 +27359,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.yoshinzemi.conaviMessage;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.aps.conavimessage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -27476,7 +27511,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.yoshinzemi.conaviMessage;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.aps.conavimessage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
@@ -27505,7 +27541,8 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.yoshinzemi.conaviMessage;
+				MARKETING_VERSION = 1.4.1;
+				PRODUCT_BUNDLE_IDENTIFIER = net.conavi.aps.conavimessage;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";

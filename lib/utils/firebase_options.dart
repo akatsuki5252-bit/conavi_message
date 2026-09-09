@@ -51,19 +51,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyAB55j7yPvrKCbq70FJmPwp4nJNQnIvYDs',
-    appId: '1:831737840062:android:b94bd15fa89349cda539ef',
+    appId: '1:831737840062:android:61158864a90a1386a539ef',
     messagingSenderId: '831737840062',
     projectId: 'conavi-message',
     storageBucket: 'conavi-message.appspot.com',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDF_DaWN70gZJMQrgxhrjFVG80_VGmrnuA',
-    appId: '1:831737840062:ios:2c3bf63e3f0f34afa539ef',
+    appId: '1:831737840062:ios:acff7a0e9ba65765a539ef',
     messagingSenderId: '831737840062',
     projectId: 'conavi-message',
     storageBucket: 'conavi-message.appspot.com',
-    iosClientId: '831737840062-7ae94n9id2vesub1gvd1a5v14q1afe7p.apps.googleusercontent.com',
-    iosBundleId: 'net.conavi.yoshinzemi.conaviMessage',
+    iosBundleId: 'net.conavi.aps.conavimessage',
   );
 }
