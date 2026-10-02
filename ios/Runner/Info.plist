@@ -37,11 +37,11 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera Library Access Warning</string>
+	<string>メッセージに添付する写真を撮影するため、カメラを使用します。</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>This app save images to your photo library</string>
+	<string>画像を写真ライブラリに保存するため、写真ライブラリへのアクセスを使用します。</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Photo Library Access Warning</string>
+	<string>メッセージに写真を添付するため、写真ライブラリへのアクセスを使用します。</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UIBackgroundModes</key>
