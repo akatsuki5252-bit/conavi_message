@@ -544,8 +544,8 @@ class _MessageRoomPageState extends ConsumerState<MessageRoomPage> with WidgetsB
                                   child: TextField(
                                     controller: controller,
                                     keyboardType: TextInputType.multiline,
-                                    maxLines: null,
                                     minLines: 1,
+                                    maxLines: 5,
                                     cursorColor: Colors.grey,
                                     onTap: () {
                                       if(_isInputOptionIcons){

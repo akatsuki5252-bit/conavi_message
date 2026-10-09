@@ -523,8 +523,8 @@ class _GroupMessageRoomPageState extends ConsumerState<GroupMessageRoomPage> {
                                       child: TextField(
                                         controller: textController,
                                         keyboardType: TextInputType.multiline,
-                                        maxLines: null,
                                         minLines: 1,
+                                        maxLines: 5,
                                         cursorColor: Colors.grey,
                                         onTap: () {
                                           if(_isInputOptionIcons){
